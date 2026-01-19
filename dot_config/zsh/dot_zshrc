@@ -1,6 +1,7 @@
 alias md=mkdir -p
 alias v=nvim
 alias lv=yazi
+alias lg=lazygit
 alias cm=chezmoi
 
 # Carapace config
