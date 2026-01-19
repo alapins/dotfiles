@@ -1,0 +1,86 @@
+palette = "slate2"
+
+format = """
+$directory\
+[](fg:directory_bg bg:git_bg)\
+$git_branch\
+$git_status\
+[](fg:git_bg bg:lang_bg)\
+$nodejs\
+$rust\
+$golang\
+$php\
+$java\
+[ ](fg:lang_bg bg:term_bg)\
+"""
+
+[directory]
+style = "fg:directory_fg bg:directory_bg"
+format = "[ $path ]($style)"
+truncation_length = 30
+truncation_symbol = "…/"
+truncate_to_repo = false
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+[git_branch]
+symbol = ""
+style = "bg:git_bg"
+format = '[[ $symbol $branch ](fg:directory_fg bg:git_bg)]($style)'
+
+[git_status]
+style = "bg:git_bg"
+format = '[[($all_status$ahead_behind )](fg:directory_fg bg:git_bg)]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:lang_bg"
+format = '[[ $symbol ($version) ](fg:directory_fg bg:lang_bg)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:lang_bg"
+format = '[[ $symbol ($version) ](fg:directory_fg bg:lang_bg)]($style)'
+
+[golang]
+symbol = ""
+style = "bg:lang_bg"
+format = '[[ $symbol ($version) ](fg:directory_fg bg:lang_bg)]($style)'
+
+[php]
+symbol = ""
+style = "bg:lang_bg"
+format = '[[ $symbol ($version) ](fg:directory_fg bg:lang_bg)]($style)'
+
+[java]
+symbol = "󰬷"
+style = "bg:lang_bg"
+format = '[[ $symbol ($version) ](fg:directory_fg bg:lang_bg)]($style)'
+
+[palettes.evergreen]
+directory_fg = "#F7EBE7"
+directory_bg = "#0A2D2E"
+git_fg = ""
+git_bg = "#1C4E4F"
+lang_fg = ""
+lang_bg = "#436E6F"
+term_bg = "#181818"
+
+[palettes.slate]
+directory_fg = "#F7EBE7"
+directory_bg = "#1f2838"
+git_bg = "#364763"
+lang_bg = "#475d81"
+term_bg = "#181818"
+
+[palettes.slate2]
+directory_fg = "#F7EBE7"
+directory_bg = "#5e687f"
+git_bg = "#4f576b"
+lang_bg = "#343947"
+term_bg = "#181818"
+

@@ -1,0 +1,8 @@
+[".config/tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm"
+    refreshPeriod = "168h"
+[".config/nvim"]
+    type = "git-repo"
+    url = "https://github.com/LazyVim/starter"
+    refreshPeriod = "168h"

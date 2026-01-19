@@ -1,0 +1,5 @@
+alias md=mkdir -p
+alias v=nvim
+alias cm=chezmoi
+
+eval "$(starship init zsh)"

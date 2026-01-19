@@ -1,0 +1,13 @@
+brew "ripgrep"
+brew "sevenzip"
+brew "imagemagick"
+brew "resvg"
+brew "zoxide"
+brew "poppler"
+brew "yazi"
+brew "dust"
+brew "bat"
+brew "lazygit"
+brew "lazydocker"
+brew "carapace"
+
