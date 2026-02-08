@@ -1,30 +1,12 @@
 {
     (
         modifiers: [
-            Super,
-        ],
-        key: "F11",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-        ],
-        key: "c",
-    ): Orientation(Vertical),
-    (
-        modifiers: [
             Ctrl,
             Alt,
         ],
-        key: "e",
-        description: Some("File Manger"),
-    ): Spawn("dolphin"),
-    (
-        modifiers: [
-            Super,
-        ],
-        key: "t",
-    ): Disable,
+        key: "o",
+        description: Some("Obsidian"),
+    ): Spawn("xdg-open obsidian://daily"),
     (
         modifiers: [
             Super,
@@ -42,6 +24,32 @@
         modifiers: [
             Super,
         ],
+        key: "F11",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "c",
+    ): Orientation(Vertical),
+    (
+        modifiers: [
+            Super,
+        ],
         key: "v",
     ): Orientation(Horizontal),
+    (
+        modifiers: [
+            Ctrl,
+            Alt,
+        ],
+        key: "e",
+        description: Some("File Manger"),
+    ): Spawn("dolphin"),
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "t",
+    ): Disable,
 }

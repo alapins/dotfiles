@@ -1,0 +1,48 @@
+[podus_alex]
+type = sftp
+host = podus
+key_file = ~/.ssh/id_rsa
+# key_use_agent = true
+shell_type = unix
+md5sum_command = md5sum
+sha1sum_command = sha1sum
+
+[plexus_alex]
+type = sftp
+host = plexus
+key_file = ~/.ssh/id_rsa
+# key_use_agent = true
+shell_type = unix
+md5sum_command = md5sum
+sha1sum_command = sha1sum
+
+[servus_root]
+type = sftp
+host = servus
+user = root
+key_file = ~/.ssh/id_rsa
+# key_use_agent = true
+shell_type = unix
+md5sum_command = md5sum
+sha1sum_command = sha1sum
+
+[podus]
+type = alias
+remote = podus_alex:/
+
+[plexus]
+type = alias
+remote = plexus_alex:/
+
+[servus]
+type = alias
+remote = servus_root:/mnt/user
+
+[gdrive]
+type = drive
+client_id = {{ keepassxcAttribute "rclone gdrive keys" "client_id" }}
+client_secret = {{ keepassxcAttribute "rclone gdrive keys" "client_secret" }}
+scope = drive
+token = {"access_token":"{{ keepassxcAttribute "rclone gdrive keys" "access_token" }}","token_type":"Bearer","refresh_token":"{{ keepassxcAttribute "rclone gdrive keys" "refresh_token" }}","expiry":"2026-02-08T19:03:19.300973327-05:00","expires_in":3599}
+team_drive = 
+
