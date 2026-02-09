@@ -10,4 +10,5 @@ brew "bat"
 brew "lazygit"
 brew "lazydocker"
 brew "carapace"
+brew "ferdium"
 
