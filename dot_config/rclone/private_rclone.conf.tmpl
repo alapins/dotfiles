@@ -40,9 +40,9 @@ remote = servus_root:/mnt/user
 
 [gdrive]
 type = drive
-client_id = {{ keepassxcAttribute "rclone gdrive keys" "client_id" }}
-client_secret = {{ keepassxcAttribute "rclone gdrive keys" "client_secret" }}
+client_id = {{ keepassxcAttribute "rclone-gdrive-keys" "client_id" }}
+client_secret = {{ keepassxcAttribute "rclone-gdrive-keys" "client_secret" }}
 scope = drive
-token = {"access_token":"{{ keepassxcAttribute "rclone gdrive keys" "access_token" }}","token_type":"Bearer","refresh_token":"{{ keepassxcAttribute "rclone gdrive keys" "refresh_token" }}","expiry":"2026-02-08T19:03:19.300973327-05:00","expires_in":3599}
+token = {"access_token":"{{ keepassxcAttribute "rclone-gdrive-keys" "access_token" }}","token_type":"Bearer","refresh_token":"{{ keepassxcAttribute "rclone-gdrive-keys" "refresh_token" }}","expiry":"2026-02-08T19:03:19.300973327-05:00","expires_in":3599}
 team_drive = 
 

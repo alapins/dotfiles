@@ -1,4 +1,3 @@
 #!/bin/bash
 
-flatpak run --command=keepassxc-cli org.keepassxc.KeePassXC -- "$@"
-
+flatpak run --command=keepassxc-cli org.keepassxc.KeePassXC $@
