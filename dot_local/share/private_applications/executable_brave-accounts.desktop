@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Accounts (Brave)
+Comment=opens sites for accounts
+Exec=brave-accounts.sh
+Icon=~/.local/share/icons/default/bill-invoice.svg
+Terminal=false
+Categories=Network;WebBrowser;Finance;

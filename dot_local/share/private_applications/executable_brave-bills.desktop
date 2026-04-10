@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Bills (Brave)
+Comment=opens sites for monthly bills
+Exec=brave-bills.sh
+Icon=~/.local/share/icons/default/bill-invoice.svg
+Terminal=false
+Categories=Network;WebBrowser;Bills;Finance;
