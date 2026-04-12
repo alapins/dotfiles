@@ -7,19 +7,33 @@
     ): Fullscreen,
     (
         modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "s",
+    ): System(Screenshot),
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "F11",
+    ): Disable,
+    (
+        modifiers: [
+            Ctrl,
+            Alt,
+        ],
+        key: "o",
+        description: Some("Obsidian"),
+    ): Spawn("xdg-open obsidian://daily"),
+    (
+        modifiers: [
             Ctrl,
             Alt,
         ],
         key: "e",
         description: Some("File Manger"),
     ): Spawn("dolphin"),
-    (
-        modifiers: [
-            Super,
-            Shift,
-        ],
-        key: "s",
-    ): System(Screenshot),
     (
         modifiers: [
             Super,
@@ -35,6 +49,13 @@
     ): System(Terminal),
     (
         modifiers: [
+            Ctrl,
+            Alt,
+        ],
+        key: "s",
+    ): Spawn("~/.local/bin/ssh-launcher.sh"),
+    (
+        modifiers: [
             Super,
         ],
         key: "t",
@@ -43,20 +64,6 @@
         modifiers: [
             Super,
         ],
-        key: "F11",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-        ],
         key: "v",
     ): Orientation(Horizontal),
-    (
-        modifiers: [
-            Ctrl,
-            Alt,
-        ],
-        key: "o",
-        description: Some("Obsidian"),
-    ): Spawn("xdg-open obsidian://daily"),
 }

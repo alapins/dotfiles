@@ -1,0 +1,12 @@
+(
+    name: "SSH Only",
+    description: "Connect to SSH hosts",
+    bin: (
+        path: "ssh-hosts.sh",
+    ),
+    icon: Name("network-server"),
+    query: (
+        regex: "^ssh ",
+        isolate: true,
+    )
+)

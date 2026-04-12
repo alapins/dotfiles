@@ -1,0 +1,12 @@
+(
+  name:"SSH Hosts",
+  description: "Connect to SSH hosts from ~/.ssh/config",
+  bin: (
+    path: "ssh-hosts.sh"
+  ),
+  icon: Name("network-server"),
+  query: (
+    persistent: true,
+    regex: "^(?!ssh ).*",
+  )
+)
