@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Servus Maintanance (Chrome)
+Comment=Maintenance sites for servus
+Exec=chrome-servus.sh
+Icon=UNRAID
+Terminal=false
+Categories=Network;WebBrowser;Server;

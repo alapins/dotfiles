@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Book Downloads(Chrome)
+Comment=Book Download Applications and Relevant Sites
+Exec=chrome-books.sh
+Icon=readarr
+Terminal=false
+Categories=Network;WebBrowser;Server;

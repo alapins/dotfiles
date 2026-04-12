@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Show Downloads (Chrome)
+Comment=TV and Movie Download Applications and Relevant Sites
+Exec=chrome-shows.sh
+Icon=Sonarr
+Terminal=false
+Categories=Network;WebBrowser;Server;

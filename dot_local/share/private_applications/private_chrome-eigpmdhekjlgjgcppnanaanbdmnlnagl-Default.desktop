@@ -1,0 +1,24 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Terminal=false
+Type=Application
+Name=Outlook (PWA)
+MimeType=x-scheme-handler/mailto;x-scheme-handler/google-chrome;
+Exec=/usr/lib/opt/google/chrome/google-chrome --profile-directory=Default --app-id=eigpmdhekjlgjgcppnanaanbdmnlnagl %U
+Icon=chrome-eigpmdhekjlgjgcppnanaanbdmnlnagl-Default
+NoDisplay=true
+StartupWMClass=crx_eigpmdhekjlgjgcppnanaanbdmnlnagl
+Actions=New-event;New-message;Open-calendar
+
+[Desktop Action New-event]
+Name=New event
+Exec=/usr/lib/opt/google/chrome/google-chrome --profile-directory=Default --app-id=eigpmdhekjlgjgcppnanaanbdmnlnagl --app-launch-url-for-shortcuts-menu-item=https://outlook.live.com/calendar/deeplink/compose
+
+[Desktop Action New-message]
+Name=New message
+Exec=/usr/lib/opt/google/chrome/google-chrome --profile-directory=Default --app-id=eigpmdhekjlgjgcppnanaanbdmnlnagl --app-launch-url-for-shortcuts-menu-item=https://outlook.live.com/mail/deeplink/compose
+
+[Desktop Action Open-calendar]
+Name=Open calendar
+Exec=/usr/lib/opt/google/chrome/google-chrome --profile-directory=Default --app-id=eigpmdhekjlgjgcppnanaanbdmnlnagl --app-launch-url-for-shortcuts-menu-item=https://outlook.live.com/calendar
