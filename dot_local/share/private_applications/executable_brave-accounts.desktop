@@ -4,6 +4,6 @@ Type=Application
 Name=Accounts (Brave)
 Comment=opens sites for accounts
 Exec=brave-accounts.sh
-Icon=~/.local/share/icons/default/bill-invoice.svg
+Icon=bank-account
 Terminal=false
 Categories=Network;WebBrowser;Finance;
