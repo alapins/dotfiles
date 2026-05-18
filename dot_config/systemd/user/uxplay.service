@@ -5,7 +5,7 @@ PartOf=graphical-session.target
 
 [Service]
 ExecStart=%h/.local/bin/uxplay-session
-Restart=on-failure
+Restart=always
 RestartSec=5
 
 [Install]
