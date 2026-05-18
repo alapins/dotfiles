@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+INHIBIT_PID=""
+POLL_INTERVAL=5
+
+take_inhibitor() {
+    [ -n "$INHIBIT_PID" ] && return
+    systemd-inhibit --what=sleep --who=uxplay \
+        --why="AirPlay stream active" --mode=block \
+        sleep infinity &
+    INHIBIT_PID=$!
+}
+
+release_inhibitor() {
+    [ -z "$INHIBIT_PID" ] && return
+    kill "$INHIBIT_PID" 2>/dev/null || true
+    wait "$INHIBIT_PID" 2>/dev/null || true
+    INHIBIT_PID=""
+}
+
+cleanup() {
+    release_inhibitor
+    [ -n "$UXPLAY_PID" ] && kill "$UXPLAY_PID" 2>/dev/null || true
+}
+
+trap cleanup EXIT INT TERM
+
+uxplay &
+UXPLAY_PID=$!
+
+while kill -0 "$UXPLAY_PID" 2>/dev/null; do
+    if ss -tnp state established 2>/dev/null | grep -q "pid=$UXPLAY_PID,"; then
+        take_inhibitor
+    else
+        release_inhibitor
+    fi
+    sleep "$POLL_INTERVAL"
+done
