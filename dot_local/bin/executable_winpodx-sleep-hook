@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """
-Stops the winpodx pod before system sleep and restarts it on resume.
-Holds a D-Bus 'delay' inhibitor so the system waits for pod shutdown.
-Run as a systemd user service.
+Suspends the winpodx QEMU VM before system sleep (full state preserved)
+and restores it on resume. Holds a D-Bus delay inhibitor so the system
+waits for clean VM suspension.
+
+Pre-sleep: pause VM → migrate state to disk → kill QEMU → release inhibitor
+Post-resume: restore state via -incoming → resume VM → clean up
 """
 import dbus
 import dbus.mainloop.glib
@@ -11,6 +14,18 @@ import subprocess
 import os
 import sys
 import logging
+import time
+import re
+import yaml
+
+COMPOSE_FILE = os.path.expanduser("~/.config/winpodx/compose.yaml")
+COMPOSE_RESTORE = os.path.expanduser("~/.config/winpodx/compose-restore.yaml")
+STORAGE_DIR = os.path.expanduser("~/.local/share/winpodx/storage")
+STATE_FILE = os.path.join(STORAGE_DIR, "vm-suspend.bin")
+MARKER_FILE = os.path.join(STORAGE_DIR, "vm-suspend.ready")
+CONTAINER = "winpodx-windows"
+MON_PORT = 7100
+MIGRATE_TIMEOUT = 2.5  # seconds; tight because InhibitDelayMaxSec=5
 
 logging.basicConfig(
     level=logging.INFO,
@@ -25,7 +40,10 @@ login1 = bus.get_object("org.freedesktop.login1", "/org/freedesktop/login1")
 manager = dbus.Interface(login1, "org.freedesktop.login1.Manager")
 
 inhibit_fd = None
+_ANSI = re.compile(r"\x1b\[[0-9;]*[a-zA-Z]|\x1b\(B")
 
+
+# ── D-Bus inhibitor ────────────────────────────────────────────────────────
 
 def take_inhibitor():
     global inhibit_fd
@@ -33,7 +51,7 @@ def take_inhibitor():
         return
     try:
         fd = manager.Inhibit(
-            "sleep", "winpodx", "Stopping Windows VM before sleep", "delay"
+            "sleep", "winpodx", "Suspending Windows VM before sleep", "delay"
         )
         inhibit_fd = fd.take()
         log.info("Took sleep inhibitor (fd=%d)", inhibit_fd)
@@ -53,47 +71,205 @@ def release_inhibitor():
     inhibit_fd = None
 
 
-def pod_running():
+# ── QEMU monitor helpers ───────────────────────────────────────────────────
+
+def _mon(cmd, timeout=4):
+    """Send one HMP command; return stripped output."""
     try:
-        result = subprocess.run(
-            ["winpodx", "pod", "status"],
-            capture_output=True,
-            text=True,
-            timeout=10,
+        r = subprocess.run(
+            ["podman", "exec", CONTAINER, "sh", "-c",
+             f"printf '{cmd}\\n' | nc -q2 -w{timeout} 127.0.0.1 {MON_PORT}"],
+            capture_output=True, text=True, timeout=timeout + 5,
         )
-        return "running" in result.stdout.lower()
+        return _ANSI.sub("", r.stdout)
+    except Exception:
+        return ""
+
+
+# ── Container state ────────────────────────────────────────────────────────
+
+def container_running():
+    try:
+        r = subprocess.run(
+            ["podman", "inspect", "--format", "{{.State.Status}}", CONTAINER],
+            capture_output=True, text=True, timeout=5,
+        )
+        return r.stdout.strip() == "running"
     except Exception:
         return False
 
 
+def wait_exit(timeout=5):
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if not container_running():
+            return True
+        time.sleep(0.3)
+    return False
+
+
+# ── Pre-sleep: save state ──────────────────────────────────────────────────
+
+def presleep():
+    log.info("Suspending VM (InhibitDelayMaxSec=5s budget)")
+
+    # Prevent auto-restart when QEMU exits later
+    subprocess.run(
+        ["podman", "update", "--restart=no", CONTAINER],
+        capture_output=True, timeout=5,
+    )
+
+    # Pause VM then start file migration in two quick nc calls
+    _mon("stop", timeout=3)
+    _mon("migrate -d file:/storage/vm-suspend.bin", timeout=3)
+
+    # Poll for completion (budget: MIGRATE_TIMEOUT seconds)
+    completed = False
+    deadline = time.monotonic() + MIGRATE_TIMEOUT
+    while time.monotonic() < deadline:
+        time.sleep(0.2)
+        out = _mon("info migrate", timeout=2)
+        if "completed" in out.lower():
+            completed = True
+            break
+        if "failed" in out.lower():
+            log.warning("Migration failed: %s", out[:200].strip())
+            break
+
+    if completed:
+        log.info("VM state saved successfully")
+        open(MARKER_FILE, "w").close()
+        _write_restore_compose()
+    else:
+        log.warning("Migration did not complete in time — state not preserved")
+        try:
+            os.unlink(STATE_FILE)
+        except OSError:
+            pass
+
+    # Stop QEMU (VM already paused, so this is nearly instant)
+    _mon("quit", timeout=2)
+    if not wait_exit(timeout=3):
+        log.warning("Container did not exit, force-killing")
+        subprocess.run(
+            ["podman", "kill", "--signal", "SIGKILL", CONTAINER],
+            capture_output=True, timeout=5,
+        )
+        wait_exit(timeout=2)
+
+    log.info("VM stopped, releasing inhibitor")
+
+
+def _write_restore_compose():
+    with open(COMPOSE_FILE) as f:
+        compose = yaml.safe_load(f)
+    svc = compose["services"]["windows"]
+    existing = svc.get("environment", {}).get("ARGUMENTS", "")
+    svc["environment"]["ARGUMENTS"] = (
+        f"{existing} -incoming file:/storage/vm-suspend.bin".strip()
+    )
+    svc["restart"] = "no"
+    with open(COMPOSE_RESTORE, "w") as f:
+        yaml.dump(compose, f, default_flow_style=False, allow_unicode=True)
+    log.info("Wrote %s", COMPOSE_RESTORE)
+
+
+# ── Post-resume: restore state ─────────────────────────────────────────────
+
+def resume():
+    take_inhibitor()
+    if not os.path.exists(MARKER_FILE):
+        log.info("No saved state — starting VM normally")
+        _start_normal()
+        release_inhibitor()
+        return
+
+    log.info("Saved state found — restoring VM")
+    try:
+        _restore()
+    except Exception as e:
+        log.error("Restore failed (%s) — falling back to normal start", e)
+        _cleanup()
+        _start_normal()
+    finally:
+        release_inhibitor()
+
+
+def _restore():
+    # Remove stopped container so compose recreates it fresh
+    subprocess.run(["podman", "rm", CONTAINER], capture_output=True, timeout=10)
+
+    # Start container with -incoming to load saved state
+    subprocess.run(
+        ["podman-compose", "-f", COMPOSE_RESTORE, "up", "-d"],
+        capture_output=True, timeout=60,
+    )
+
+    # Wait for container to come up
+    time.sleep(3)
+    if not container_running():
+        raise RuntimeError("Container exited immediately after -incoming start")
+
+    # Touch QEMU_END so the 30s boot watchdog doesn't kill QEMU
+    # (boot detection expects normal boot output; -incoming skips that)
+    subprocess.run(
+        ["podman", "exec", CONTAINER, "touch", "/run/shm/qemu.end"],
+        capture_output=True, timeout=5,
+    )
+
+    # Wait for incoming migration to complete loading
+    deadline = time.monotonic() + 30
+    while time.monotonic() < deadline:
+        time.sleep(1)
+        out = _mon("info migrate", timeout=3)
+        if "completed" in out.lower():
+            log.info("VM state loaded successfully")
+            break
+        if not container_running():
+            raise RuntimeError("Container died during state restore")
+    else:
+        log.warning("State load status unclear — proceeding")
+
+    # Resume execution (VM was paused when state was saved)
+    _mon("cont", timeout=3)
+    log.info("VM resumed")
+
+    _cleanup()
+    subprocess.run(
+        ["podman", "update", "--restart=unless-stopped", CONTAINER],
+        capture_output=True, timeout=5,
+    )
+
+
+def _start_normal():
+    try:
+        subprocess.run(["winpodx", "pod", "start"], timeout=30, check=False)
+    except Exception as e:
+        log.warning("winpodx pod start failed: %s", e)
+
+
+def _cleanup():
+    for path in (MARKER_FILE, STATE_FILE, COMPOSE_RESTORE):
+        try:
+            os.unlink(path)
+        except OSError:
+            pass
+    log.info("Cleaned up state files")
+
+
+# ── D-Bus signal handler ───────────────────────────────────────────────────
+
 def on_prepare_for_sleep(sleeping):
     if sleeping:
-        log.info("PrepareForSleep(true): stopping winpodx pod")
-        if pod_running():
-            try:
-                subprocess.run(
-                    ["winpodx", "pod", "stop"],
-                    timeout=60,
-                    check=False,
-                )
-                log.info("Pod stopped")
-            except Exception as e:
-                log.warning("Pod stop failed: %s", e)
+        log.info("PrepareForSleep(true)")
+        if container_running():
+            presleep()
         else:
-            log.info("Pod was not running, skipping stop")
+            log.info("VM not running, nothing to suspend")
         release_inhibitor()
     else:
-        log.info("PrepareForSleep(false): system resumed, restarting winpodx pod")
-        take_inhibitor()
-        try:
-            subprocess.run(
-                ["winpodx", "pod", "start"],
-                timeout=30,
-                check=False,
-            )
-            log.info("Pod start issued")
-        except Exception as e:
-            log.warning("Pod start failed: %s", e)
+        log.info("PrepareForSleep(false) — system resumed")
+        resume()
 
 
 bus.add_signal_receiver(
