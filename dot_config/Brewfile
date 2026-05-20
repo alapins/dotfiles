@@ -11,4 +11,5 @@ brew "lazygit"
 brew "lazydocker"
 brew "carapace"
 brew "rust"
+brew "uv"
 
