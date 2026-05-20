@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+"""
+Stops the winpodx pod before system sleep and restarts it on resume.
+Holds a D-Bus 'delay' inhibitor so the system waits for pod shutdown.
+Run as a systemd user service.
+"""
+import dbus
+import dbus.mainloop.glib
+from gi.repository import GLib
+import subprocess
+import os
+import sys
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+    stream=sys.stderr,
+)
+log = logging.getLogger("winpodx-sleep-hook")
+
+dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+bus = dbus.SystemBus()
+login1 = bus.get_object("org.freedesktop.login1", "/org/freedesktop/login1")
+manager = dbus.Interface(login1, "org.freedesktop.login1.Manager")
+
+inhibit_fd = None
+
+
+def take_inhibitor():
+    global inhibit_fd
+    if inhibit_fd is not None:
+        return
+    try:
+        fd = manager.Inhibit(
+            "sleep", "winpodx", "Stopping Windows VM before sleep", "delay"
+        )
+        inhibit_fd = fd.take()
+        log.info("Took sleep inhibitor (fd=%d)", inhibit_fd)
+    except Exception as e:
+        log.warning("Could not take inhibitor: %s", e)
+
+
+def release_inhibitor():
+    global inhibit_fd
+    if inhibit_fd is None:
+        return
+    try:
+        os.close(inhibit_fd)
+        log.info("Released sleep inhibitor")
+    except OSError:
+        pass
+    inhibit_fd = None
+
+
+def pod_running():
+    try:
+        result = subprocess.run(
+            ["winpodx", "pod", "status"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        return "running" in result.stdout.lower()
+    except Exception:
+        return False
+
+
+def on_prepare_for_sleep(sleeping):
+    if sleeping:
+        log.info("PrepareForSleep(true): stopping winpodx pod")
+        if pod_running():
+            try:
+                subprocess.run(
+                    ["winpodx", "pod", "stop"],
+                    timeout=60,
+                    check=False,
+                )
+                log.info("Pod stopped")
+            except Exception as e:
+                log.warning("Pod stop failed: %s", e)
+        else:
+            log.info("Pod was not running, skipping stop")
+        release_inhibitor()
+    else:
+        log.info("PrepareForSleep(false): system resumed, restarting winpodx pod")
+        take_inhibitor()
+        try:
+            subprocess.run(
+                ["winpodx", "pod", "start"],
+                timeout=30,
+                check=False,
+            )
+            log.info("Pod start issued")
+        except Exception as e:
+            log.warning("Pod start failed: %s", e)
+
+
+bus.add_signal_receiver(
+    on_prepare_for_sleep,
+    signal_name="PrepareForSleep",
+    dbus_interface="org.freedesktop.login1.Manager",
+    bus_name="org.freedesktop.login1",
+    path="/org/freedesktop/login1",
+)
+
+take_inhibitor()
+log.info("winpodx-sleep-hook ready")
+
+loop = GLib.MainLoop()
+try:
+    loop.run()
+except KeyboardInterrupt:
+    pass
+finally:
+    release_inhibitor()

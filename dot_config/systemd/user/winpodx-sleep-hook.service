@@ -1,0 +1,12 @@
+[Unit]
+Description=Stop winpodx pod before system sleep
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+ExecStart=%h/.local/bin/winpodx-sleep-hook
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=graphical-session.target
