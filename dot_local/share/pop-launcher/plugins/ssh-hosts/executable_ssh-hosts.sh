@@ -46,7 +46,7 @@ while IFS= read -r line; do
         emit_results "$query"
 
     elif printf '%s' "$line" | grep -q '"Activate"'; then
-        id=$(printf '%s' "$line" | grep -o '"id":[0-9]*' | grep -o '[0-9]*')
+        id=$(printf '%s' "$line" | grep -o '"Activate":[0-9]*' | grep -o '[0-9]*')
         host=$(get_hosts | sed -n "$((id + 1))p")
         echo "Got activate for id=$id host=$host" >> /tmp/ssh-plugin.log
         launch_terminal "$host"
