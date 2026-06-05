@@ -1,4 +1,9 @@
 #!/bin/bash
+
+if [[ -n "$SEANCE_SHELL_INTEGRATION" ]]; then
+  exec zsh
+fi
+
 SESSION_PREFIX="ghostty"
 i=0
 

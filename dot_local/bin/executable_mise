@@ -1,0 +1,4 @@
+#!/bin/bash
+# Wrapper to force argv[0]="mise" — needed in Seance where the AppImage runtime
+# replaces argv[0] with the AppImage path, causing mise to trigger handle_shim.
+exec -a mise /home/linuxbrew/.linuxbrew/bin/mise "$@"

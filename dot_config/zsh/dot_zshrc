@@ -23,3 +23,24 @@ eval "$(starship init zsh)"
 ### bling.sh source start
 test -f /usr/share/ublue-os/bling/bling.sh && source /usr/share/ublue-os/bling/bling.sh
 ### bling.sh source end
+
+# In Seance, the AppImage runtime replaces argv[0] with the AppImage path for
+# all exec'd processes. The ~/.local/bin/mise wrapper fixes this for the initial
+# activation, but the hooks bling generates use the hardcoded linuxbrew path.
+# Override them here so hook-env calls also use exec -a mise.
+if [[ -n "$SEANCE_SHELL_INTEGRATION" ]]; then
+  _mise_hook() {
+    eval "$(exec -a mise /home/linuxbrew/.linuxbrew/bin/mise hook-env -s zsh)"
+  }
+  _mise_hook_precmd() {
+    if [[ "${__MISE_ZSH_CHPWD_RAN:-0}" == "1" ]]; then
+      export __MISE_ZSH_CHPWD_RAN=0
+      return
+    fi
+    eval "$(exec -a mise /home/linuxbrew/.linuxbrew/bin/mise hook-env -s zsh --reason precmd)"
+  }
+  _mise_hook_chpwd() {
+    export __MISE_ZSH_CHPWD_RAN=1
+    eval "$(exec -a mise /home/linuxbrew/.linuxbrew/bin/mise hook-env -s zsh --reason chpwd)"
+  }
+fi
