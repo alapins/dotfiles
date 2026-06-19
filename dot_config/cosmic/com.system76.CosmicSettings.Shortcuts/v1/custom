@@ -3,21 +3,47 @@
         modifiers: [
             Super,
         ],
+        key: "F11",
+    ): Disable,
+    (
+        modifiers: [
+            Ctrl,
+            Alt,
+        ],
+        key: "e",
+        description: Some("File Manger"),
+    ): Spawn("dolphin"),
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "t",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+        ],
         key: "f",
     ): Fullscreen,
     (
         modifiers: [
             Super,
-            Shift,
+        ],
+        key: "c",
+    ): Orientation(Vertical),
+    (
+        modifiers: [
+            Ctrl,
+            Alt,
         ],
         key: "s",
-    ): System(Screenshot),
+    ): Spawn("~/.local/bin/ssh-launcher.sh"),
     (
         modifiers: [
             Super,
         ],
-        key: "F11",
-    ): Disable,
+        key: "v",
+    ): Orientation(Horizontal),
     (
         modifiers: [
             Ctrl,
@@ -31,15 +57,16 @@
             Ctrl,
             Alt,
         ],
-        key: "e",
-        description: Some("File Manger"),
-    ): Spawn("dolphin"),
+        key: "v",
+        description: Some("Ringboard Clipboard"),
+    ): Spawn("/home/alex/.cargo/bin/ringboard-egui toggle"),
     (
         modifiers: [
             Super,
+            Shift,
         ],
-        key: "c",
-    ): Orientation(Vertical),
+        key: "s",
+    ): System(Screenshot),
     (
         modifiers: [
             Ctrl,
@@ -47,23 +74,4 @@
         ],
         key: "t",
     ): System(Terminal),
-    (
-        modifiers: [
-            Ctrl,
-            Alt,
-        ],
-        key: "s",
-    ): Spawn("~/.local/bin/ssh-launcher.sh"),
-    (
-        modifiers: [
-            Super,
-        ],
-        key: "t",
-    ): Disable,
-    (
-        modifiers: [
-            Super,
-        ],
-        key: "v",
-    ): Orientation(Horizontal),
 }
