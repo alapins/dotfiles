@@ -4,7 +4,8 @@ keybind = super+alt+t=toggle_quick_terminal
 quick-terminal-position = top
 quick-terminal-size = 30%
 cursor-style = block
-cursor-opacity = 0.7
+cursor-color = #e4e4e4
+cursor-text = #181818
 
 keybind = ctrl+comma=open_config
 keybind = ctrl+alt+f=toggle_split_zoom

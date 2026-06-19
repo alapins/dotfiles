@@ -20,6 +20,20 @@ source <(carapace _carapace)
 
 
 eval "$(starship init zsh)"
+
+_cursor_normal() { printf '\e[2 q\e]12;#e4e4e4\a'; }
+_cursor_insert() { printf '\e[6 q\e]12;#88aaff\a'; }
+
+zle-keymap-select() {
+  [[ $KEYMAP == vicmd || $1 == block ]] && _cursor_normal || _cursor_insert
+  (( $+functions[starship_zle-keymap-select] )) && starship_zle-keymap-select "$@"
+}
+zle-line-init()   { _cursor_insert; }
+zle-line-finish() { _cursor_normal; }
+
+zle -N zle-keymap-select
+zle -N zle-line-init
+zle -N zle-line-finish
 ### bling.sh source start
 test -f /usr/share/ublue-os/bling/bling.sh && source /usr/share/ublue-os/bling/bling.sh
 ### bling.sh source end
