@@ -1,13 +1,19 @@
 theme = Gruber Darker
 command = ~/.local/bin/start-tmux.sh
+keybind = super+alt+t=toggle_quick_terminal
+quick-terminal-position = top
+quick-terminal-size = 30%
+cursor-style = block
+cursor-opacity = 0.7
+
 keybind = ctrl+comma=open_config
-keybind = super+alt+f=toggle_split_zoom
-keybind = super+alt+m=goto_split:previous
-keybind = super+alt+,=goto_split:next
-keybind = super+alt+k=goto_split:up
-keybind = super+alt+l=goto_split:right
-keybind = super+alt+j=goto_split:down
-keybind = super+alt+h=goto_split:left
+keybind = ctrl+alt+f=toggle_split_zoom
+keybind = ctrl+alt+m=goto_split:previous
+keybind = ctrl+alt+,=goto_split:next
+keybind = ctrl+alt+k=goto_split:up
+keybind = ctrl+alt+l=goto_split:right
+keybind = ctrl+alt+j=goto_split:down
+keybind = ctrl+alt+h=goto_split:left
 keybind = ctrl+shift+t=new_tab
 keybind = super+alt+ctrl+u=next_tab
 keybind = ctrl+tab=next_tab
@@ -28,10 +34,10 @@ keybind = ctrl+equal=increase_font_size:1
 keybind = super+ctrl+plus=increase_font_size:1
 keybind = super+ctrl+minus=decrease_font_size:1
 keybind = ctrl+minus=decrease_font_size:1
-keybind = super+alt+shift+h=new_split:left
-keybind = super+alt+shift+l=new_split:right
-keybind = super+alt+shift+j=new_split:down
-keybind = super+alt+shift+k=new_split:up
+keybind = ctrl+alt+n=new_split:left
+keybind = ctrl+alt+.=new_split:right
+keybind = ctrl+alt+m=new_split:down
+keybind = ctrl+alt+,=new_split:up
 keybind = ctrl+shift+c=copy_to_clipboard
 keybind = ctrl+shift+q=quit
 keybind = ctrl+shift+n=new_window
@@ -63,4 +69,4 @@ keybind = alt+six=goto_tab:6
 keybind = alt+seven=goto_tab:7
 keybind = alt+eight=goto_tab:8
 keybind = alt+nine=goto_tab:9
-cursor-invert-fg-bg
+
