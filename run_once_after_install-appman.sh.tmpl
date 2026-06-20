@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Bootstrap AppMan (rootless "AM") — used for `via: appimage` entries on Linux.
+# Runs once. Non-fatal: if it can't install, it prints guidance and continues so
+# `chezmoi apply` never breaks over it.
+set -uo pipefail
+{{ if eq .chezmoi.username "root" -}}
+exit 0   # image build runs chezmoi as root; AppMan installs on the live user system
+{{ end -}}
+{{- if eq .chezmoi.os "linux" }}
+if command -v appman >/dev/null 2>&1; then
+  echo "==> appman already installed"
+  exit 0
+fi
+
+echo "==> installing AppMan (rootless AppImage manager)"
+# Canonical rootless installer from ivan-hc/AM. The installer is interactive about
+# AM (system) vs AppMan (rootless); we want AppMan. TODO(verify): confirm the exact
+# non-interactive flag against the installed version before trusting auto-install.
+installer="$(mktemp)"
+if curl -fsSL https://raw.githubusercontent.com/ivan-hc/AM/main/AM-INSTALLER -o "$installer"; then
+  chmod +x "$installer"
+  # Best-effort non-interactive AppMan (rootless) install; tolerate failure.
+  if ! "$installer" --appman 2>/dev/null && ! printf '2\ny\n' | "$installer" 2>/dev/null; then
+    cat <<'EOF'
+ warn  Could not auto-install AppMan. Install it once manually:
+        wget https://raw.githubusercontent.com/ivan-hc/AM/main/AM-INSTALLER \
+          && chmod a+x AM-INSTALLER && ./AM-INSTALLER     # choose AppMan (rootless)
+       Then re-run: ~/.config/appsync/install.sh
+EOF
+  fi
+  rm -f "$installer"
+else
+  echo " warn  could not download AM-INSTALLER; skipping AppMan setup"
+fi
+{{- else }}
+echo "==> AppMan is Linux-only; nothing to do on {{ .chezmoi.os }}"
+{{- end }}
+exit 0

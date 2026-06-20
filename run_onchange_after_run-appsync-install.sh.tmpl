@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Thin chezmoi hook: all real logic lives in ~/.config/appsync/. This re-runs the
+# installer whenever the app list or the appsync scripts change (hashes below).
+#
+# apps.yaml:   {{ include "dot_config/appsync/apps.yaml" | sha256sum }}
+# install.sh:  {{ include "dot_config/appsync/executable_install.sh" | sha256sum }}
+# lib.sh:      {{ include "dot_config/appsync/lib.sh" | sha256sum }}
+{{ if eq .chezmoi.username "root" -}}
+exit 0   # image build runs chezmoi as root; appsync installs on the live user system
+{{ end -}}
+set -euo pipefail
+
+# Bootstrap prerequisite: yq (mikefarah) parses apps.yaml. On Linux it is baked
+# into the image; on macOS/other we install it via brew here, BEFORE install.sh
+# runs — so there is no chicken-and-egg with the yq entry in the app list.
+if ! command -v yq >/dev/null 2>&1; then
+  if command -v brew >/dev/null 2>&1; then
+    brew install yq
+  else
+    echo "appsync: yq not found and brew unavailable — install Homebrew + yq first" >&2
+    exit 1
+  fi
+fi
+
+exec "$HOME/.config/appsync/install.sh"

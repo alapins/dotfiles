@@ -1,0 +1,125 @@
+# appsync — the single source of truth for applications across machines/OSes.
+# Add or remove an app HERE and nowhere else, then run `chezmoi apply` (or
+# `~/.config/appsync/install.sh`).
+#
+# Shape: each app is keyed by name. Use a top-level `via:` when the app is the
+# same on every OS; otherwise nest per-OS (`linux:` / `darwin:`) and give each
+# its own `via:` + fields. Add `enabled: false` to temporarily disable one.
+#
+# via values:
+#   brew                          formula (any OS)
+#   cask                          macOS GUI app (Homebrew cask)
+#   mas      id: <number>         Mac App Store app
+#   flatpak  id: <app-id>         Linux GUI app NOT already in the bluebuild image
+#   image                         Linux: provided by the bluebuild image (skipped; documents provenance)
+#   appimage am: <name> | url:    Linux: managed by AppMan
+#   mise     spec: <backend:tool> pinned single-binary CLI (aqua:/github:/ubi:/cargo:)
+#   remote-script url: [repo:]    download to ~/.local/share/appsync/installers/<app>/ then run
+#   local-script  path:           run a script under ~/.config/appsync/scripts/
+
+apps:
+
+  # ---- cross-OS CLI tools (migrated from dot_config/Brewfile) ----
+  ripgrep:    { via: brew }
+  sevenzip:   { via: brew }
+  imagemagick: { via: brew }
+  resvg:      { via: brew }
+  zoxide:     { via: brew }
+  poppler:    { via: brew }
+  yazi:       { via: brew }
+  dust:       { via: brew }
+  bat:        { via: brew }
+  lazygit:    { via: brew }
+  lazydocker: { via: brew }
+  carapace:   { via: brew }
+  rust:       { via: brew }
+  rustup:     { via: brew }
+  uv:         { via: brew }
+  # NOTE: yq is a BOOTSTRAP PREREQUISITE of appsync (it parses this file), so it is
+  # NOT listed as a managed app — that would be circular. yq is provided before
+  # install.sh ever runs: baked into the image on Linux (install-appsync-tools.sh),
+  # and installed by the chezmoi hook via brew on macOS/other.
+  topgrade:                   # universal updater (see update.sh)
+    linux: { via: image }     # baked into the image (install-appsync-tools.sh)
+    darwin: { via: brew }
+
+  # ---- apps in the Linux image; mac gets a cask equivalent ----
+  ghostty:
+    linux: { via: image }
+    darwin: { via: cask }
+  neovim:
+    linux: { via: image }
+    darwin: { via: brew }
+  emacs:
+    linux: { via: image }
+    darwin: { via: cask }
+  nushell:
+    linux: { via: image }
+    darwin: { via: brew }
+  brave-browser:
+    linux: { via: image }
+    darwin: { via: cask }
+  google-chrome:
+    linux: { via: image }
+    darwin: { via: cask }
+  syncthing:
+    linux: { via: image }
+    darwin: { via: brew }
+
+  # ---- GUI apps: flatpak on Linux (image), cask on mac ----
+  keepassxc:
+    linux: { via: image }                       # flatpak in the bluebuild
+    darwin: { via: cask }                        # cask keeps fingerprint unlock
+  obsidian:
+    linux: { via: image }
+    darwin: { via: cask }
+  vlc:
+    linux: { via: image }
+    darwin: { via: cask }
+  discord:
+    linux: { via: image }
+    darwin: { via: cask }
+  gimp:
+    linux: { via: image }
+    darwin: { via: cask }
+  inkscape:
+    linux: { via: image }
+    darwin: { via: cask }
+  krita:
+    linux: { via: image }
+    darwin: { via: cask }
+  obs:
+    linux: { via: image }                        # com.obsproject.Studio
+    darwin: { via: cask }
+  localsend:
+    linux: { via: image }
+    darwin: { via: cask }
+
+  # ---- examples of the remaining mechanisms (disabled until verified) ----
+  # ringboard installs a GUI + CLI client; route once the installer URL is confirmed.
+  ringboard:
+    enabled: false
+    linux:
+      via: remote-script
+      url: https://raw.githubusercontent.com/SUPERCILEX/clipboard-history/master/install-with-cargo-systemd.sh
+      repo: SUPERCILEX/clipboard-history              # re-run only on a new release tag
+
+  # Arbitrary local script kept under ~/.config/appsync/scripts/
+  example-local:
+    enabled: false
+    linux:
+      via: local-script
+      path: example-local.sh
+
+  # A GitHub-release single binary managed by mise (works on Linux + macOS).
+  example-mise-tool:
+    enabled: false
+    via: mise
+    spec: aqua:cli/cli            # example: GitHub CLI via aqua
+
+  # A GUI AppImage managed by AppMan.
+  example-appimage:
+    enabled: false
+    linux:
+      via: appimage
+      am: example-appimage        # AppMan catalog name (or use `url:` for an unlisted AppImage)

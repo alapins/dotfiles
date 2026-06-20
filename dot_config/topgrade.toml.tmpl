@@ -1,0 +1,19 @@
+# topgrade — universal updater config, managed by chezmoi.
+#
+# Linux: Aurora's `uupd` (behind `ujust update`) already updates the OS image,
+#        flatpaks and brew. We disable those steps so topgrade only fills the gaps
+#        (mise, AppMan/AppImages, and custom commands). On Linux, appsync's
+#        update.sh drives those directly; this config is for ad-hoc `topgrade` runs.
+# macOS: no uupd — topgrade runs the full set (brew/cask/mas/mise + custom).
+
+[misc]
+assume_yes = true
+cleanup = true
+no_retry = true
+{{- if eq .chezmoi.os "linux" }}
+# Leave OS image / flatpak / brew to uupd to avoid double-updating.
+disable = ["system", "rpm_ostree", "flatpak", "brew_formula", "brew_cask", "containers", "firmware", "distrobox"]
+{{- end }}
+
+[git]
+repos = ["~/.local/share/chezmoi"]
