@@ -32,8 +32,13 @@ apps:
   lazygit:    { via: brew }
   lazydocker: { via: brew }
   carapace:   { via: brew }
-  rust:       { via: brew }
-  rustup:     { via: brew }
+  # Rust toolchain — official rustup installer (rustup.rs), NOT brew. brew's
+  # `rust`+`rustup` conflict (rustup is keg-only) and break `brew upgrade` under
+  # `ujust update`. rustup also gives per-project version pinning via
+  # rust-toolchain.toml. Toolchain updates: `rustup update` in update.sh.
+  rustup:
+    linux:  { via: local-script, path: install-rustup.sh }
+    darwin: { via: local-script, path: install-rustup.sh }
   uv:         { via: brew }
   # NOTE: yq is a BOOTSTRAP PREREQUISITE of appsync (it parses this file), so it is
   # NOT listed as a managed app — that would be circular. yq is provided before
@@ -94,11 +99,16 @@ apps:
   localsend:
     linux: { via: image }
     darwin: { via: cask }
+  zed:
+    linux:
+      via: remote-script
+      url: https://zed.dev/install.sh
+      repo: zed-industries/zed
 
   # ---- examples of the remaining mechanisms (disabled until verified) ----
   # ringboard installs a GUI + CLI client; route once the installer URL is confirmed.
   ringboard:
-    enabled: false
+    enabled: false # the installer script is broken due to dependency compatibility issue
     linux:
       via: remote-script
       url: https://raw.githubusercontent.com/SUPERCILEX/clipboard-history/master/install-with-cargo-systemd.sh
