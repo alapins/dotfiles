@@ -93,16 +93,21 @@ apps:
   krita:
     linux: { via: image }
     darwin: { via: cask }
-  obs:
-    linux: { via: image }                        # com.obsproject.Studio
-    darwin: { via: cask }
   localsend:
     linux: { via: image }
+    darwin: { via: cask }
+  obs:
+    linux: { via: image }                        # com.obsproject.Studio
     darwin: { via: cask }
   zed:
     linux:
       via: remote-script
       url: https://zed.dev/install.sh
+      repo: openai/codex
+  codex-cli:
+    linux:
+      via: remote-script
+      url: https://chatgpt.com/codex/install.sh
       repo: zed-industries/zed
 
   # ---- examples of the remaining mechanisms (disabled until verified) ----

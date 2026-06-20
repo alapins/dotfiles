@@ -58,3 +58,6 @@ if [[ -n "$SEANCE_SHELL_INTEGRATION" ]]; then
     eval "$(exec -a mise /home/linuxbrew/.linuxbrew/bin/mise hook-env -s zsh --reason chpwd)"
   }
 fi
+autoload bashcompinit
+bashcompinit
+source "/home/alex/.local/share/bash-completion/completions/appman"
