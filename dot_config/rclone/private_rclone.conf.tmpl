@@ -38,11 +38,16 @@ remote = plexus_alex:/
 type = alias
 remote = servus_root:/mnt/user
 
+{{- if stdinIsATTY }}
 [gdrive]
 type = drive
 client_id = {{ keepassxcAttribute "rclone-gdrive-keys" "client_id" }}
 client_secret = {{ keepassxcAttribute "rclone-gdrive-keys" "client_secret" }}
 scope = drive
 token = {"access_token":"{{ keepassxcAttribute "rclone-gdrive-keys" "access_token" }}","token_type":"Bearer","refresh_token":"{{ keepassxcAttribute "rclone-gdrive-keys" "refresh_token" }}","expiry":"2026-04-11T22:58:48.802660153-04:00","expires_in":3599}
-team_drive = 
+team_drive =
+{{- else }}
+# [gdrive] omitted: KeePassXC requires an interactive TTY to unlock.
+# Re-run `chezmoi apply` from an interactive terminal to populate it.
+{{- end }}
 
