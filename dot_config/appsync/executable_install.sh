@@ -60,6 +60,15 @@ install_mise() { # app : spec like aqua:tool / github:o/r / cargo:crate
   run "mise use -g -y \"$spec\"" && ok "mise $spec"
 }
 
+install_npm() { # app : global package via `npm install -g`
+  local app=$1 pkg; pkg=$(pkgname "$app")
+  have npm || { warn "npm not installed — skipping $app"; return 0; }
+  # Presence check on the bare package name: drop a trailing @version but keep a leading scope @.
+  local name=$pkg; case ${pkg#@} in *@*) name=${pkg%@*} ;; esac
+  if npm ls -g --depth=0 "$name" >/dev/null 2>&1; then skip "npm $pkg (present)"; return 0; fi
+  run "npm install -g \"$pkg\"" && ok "npm $pkg"
+}
+
 install_remote_script() { # app
   local app=$1 url repo tag dir marker cur
   url=$(field "$app" "$OS" url); repo=$(field "$app" "$OS" repo)
@@ -101,6 +110,7 @@ while IFS= read -r app; do
       image)         skip "$app (provided by OS image)" ;;
       appimage)      install_appimage "$app" ;;
       mise)          install_mise "$app" ;;
+      npm)           install_npm "$app" ;;
       remote-script) install_remote_script "$app" ;;
       local-script)  install_local_script "$app" ;;
       *)             warn "$app: unknown via '$via'" ; exit 1 ;;

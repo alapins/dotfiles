@@ -29,6 +29,7 @@ log "appsync update (Linux) — mise, AppImages, scripts"
 if have mise; then log "mise upgrade"; mise upgrade || warn "mise upgrade had errors"; fi
 if have appman; then log "appman update"; appman -u -y || warn "appman update had errors"; fi
 if have rustup; then log "rustup update"; rustup update || warn "rustup update had errors"; fi
+if have npm; then log "npm global update"; npm update -g || warn "npm update had errors"; fi
 
 # Re-run remote/local script installers. install.sh re-checks GitHub tags and only
 # re-runs a remote-script when its repo has a newer release (idempotent otherwise).

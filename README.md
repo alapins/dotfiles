@@ -67,6 +67,7 @@ apps:
 | `image` | — | Provided by the bluebuild image; skipped (documents provenance) | Linux |
 | `appimage` | `am:` name **or** `url:` | GUI AppImage via **AppMan** (creates a launcher entry + icon) | Linux |
 | `mise` | `spec:` e.g. `aqua:cli/cli` | Single-binary CLI via mise (on your shell `PATH`) | any |
+| `npm` | `name:` (optional) | Global npm package (`npm install -g`); the app key is the package name unless `name:` overrides it (e.g. scoped pkgs) | any (where `npm` exists) |
 | `remote-script` | `url:`, `repo:` (optional) | Download the script to `~/.local/share/appsync/installers/<app>/` and run it. With `repo:`, it only re-runs when that GitHub repo cuts a new release. | any |
 | `local-script` | `path:` | Run a script under `~/.config/appsync/scripts/` | any |
 

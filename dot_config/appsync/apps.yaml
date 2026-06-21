@@ -14,6 +14,7 @@
 #   image                         Linux: provided by the bluebuild image (skipped; documents provenance)
 #   appimage am: <name> | url:    Linux: managed by AppMan
 #   mise     spec: <backend:tool> pinned single-binary CLI (aqua:/github:/ubi:/cargo:)
+#   npm      [name: <pkg>]        global npm package (`npm install -g`); any OS with npm
 #   remote-script url: [repo:]    download to ~/.local/share/appsync/installers/<app>/ then run
 #   local-script  path:           run a script under ~/.config/appsync/scripts/
 
@@ -132,6 +133,13 @@ apps:
     enabled: false
     via: mise
     spec: aqua:cli/cli            # example: GitHub CLI via aqua
+
+  # A global npm package (works on Linux + macOS wherever npm exists).
+  # The app key is the npm package name; use `name:` to override (e.g. scoped pkgs).
+  example-npm:
+    enabled: false
+    via: npm
+    # name: "@anthropic-ai/claude-code"   # override when the key isn't the pkg name
 
   # A GUI AppImage managed by AppMan.
   example-appimage:
