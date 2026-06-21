@@ -20,18 +20,19 @@
 apps:
 
   # ---- cross-OS CLI tools (migrated from dot_config/Brewfile) ----
-  ripgrep:    { via: brew }
-  sevenzip:   { via: brew }
+  ripgrep:     { via: brew }
+  sevenzip:    { via: brew }
   imagemagick: { via: brew }
-  resvg:      { via: brew }
-  zoxide:     { via: brew }
-  poppler:    { via: brew }
-  yazi:       { via: brew }
-  dust:       { via: brew }
-  bat:        { via: brew }
-  lazygit:    { via: brew }
-  lazydocker: { via: brew }
-  carapace:   { via: brew }
+  resvg:       { via: brew }
+  zoxide:      { via: brew }
+  poppler:     { via: brew }
+  yazi:        { via: brew }
+  dust:        { via: brew }
+  bat:         { via: brew }
+  lazygit:     { via: brew }
+  lazydocker:  { via: brew }
+  carapace:    { via: brew }
+  claude-code: { via: cask }
   # Rust toolchain — official rustup installer (rustup.rs), NOT brew. brew's
   # `rust`+`rustup` conflict (rustup is keg-only) and break `brew upgrade` under
   # `ujust update`. rustup also gives per-project version pinning via
