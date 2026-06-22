@@ -15,7 +15,9 @@
 #   appimage am: <name> | url:    Linux: managed by AppMan
 #   mise     spec: <backend:tool> pinned single-binary CLI (aqua:/github:/ubi:/cargo:)
 #   npm      [name: <pkg>]        global npm package (`npm install -g`); any OS with npm
-#   remote-script url: [repo:]    download to ~/.local/share/appsync/installers/<app>/ then run
+#   remote-script url: [repo:] [args:]
+#                                 download to ~/.local/share/appsync/installers/<app>/ then run;
+#                                 `args:` is appended to the script (the `bash -s -- <args>` part)
 #   local-script  path:           run a script under ~/.config/appsync/scripts/
 
 apps:
@@ -111,6 +113,12 @@ apps:
       via: remote-script
       url: https://chatgpt.com/codex/install.sh
       repo: zed-industries/zed
+  cass-memory:                                   # curl … | bash -s -- --easy-mode --verify
+    linux:
+      via: remote-script
+      url: https://raw.githubusercontent.com/Dicklesworthstone/cass_memory_system/main/install.sh
+      args: --easy-mode --verify
+      # No `repo:` gate → re-downloads and re-runs every apply (installer is idempotent).
 
   # ---- examples of the remaining mechanisms (disabled until verified) ----
   # ringboard installs a GUI + CLI client; route once the installer URL is confirmed.

@@ -70,8 +70,9 @@ install_npm() { # app : global package via `npm install -g`
 }
 
 install_remote_script() { # app
-  local app=$1 url repo tag dir marker cur
+  local app=$1 url repo tag dir marker cur args
   url=$(field "$app" "$OS" url); repo=$(field "$app" "$OS" repo)
+  args=$(field "$app" "$OS" args)          # optional flags passed to the installer
   [ -n "$url" ] || { warn "remote-script $app: needs `url:`"; return 1; }
   dir="$INSTALLERS_DIR/$app"; marker="$STATE_DIR/$app.tag"; mkdir -p "$dir"
   # If a repo is given, only (re)run when the latest tag changes.
@@ -82,7 +83,7 @@ install_remote_script() { # app
   fi
   run "curl -fsSL \"$url\" -o \"$dir/install.sh\"" || { err "remote-script $app: download failed"; return 1; }
   run "chmod +x \"$dir/install.sh\""
-  run "\"$dir/install.sh\"" && ok "remote-script $app" || { err "remote-script $app failed"; return 1; }
+  run "\"$dir/install.sh\"${args:+ $args}" && ok "remote-script $app" || { err "remote-script $app failed"; return 1; }
   [ -n "${tag:-}" ] && [ "$DRY_RUN" = 0 ] && printf '%s' "$tag" >"$marker"
   return 0
 }
