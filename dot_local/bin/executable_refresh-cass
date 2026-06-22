@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# refresh-cass — re-index coding-agent sessions and rebuild semantic embeddings.
+#
+# Semantic search in cass (https://github.com/Dicklesworthstone/coding_agent_session_search)
+# does NOT refresh embeddings automatically. This wraps the two commands needed:
+#   1. cass index --full              → discover new sessions + rebuild lexical index
+#   2. cass index --semantic --build-hnsw → rebuild MiniLM embeddings + HNSW ANN index
+#
+# Managed by chezmoi: dot_local/bin/executable_refresh-cass
+# Run on a schedule by the refresh-cass.timer systemd user unit.
+set -euo pipefail
+
+CASS="${CASS_BIN:-$HOME/.local/bin/cass}"
+if [ ! -x "$CASS" ]; then
+  CASS="$(command -v cass)" || { echo "refresh-cass: 'cass' not found on PATH or at \$HOME/.local/bin/cass" >&2; exit 127; }
+fi
+
+echo "→ Indexing sessions (discover + lexical)…"
+"$CASS" index --full
+
+echo "→ Rebuilding semantic embeddings (MiniLM) + HNSW…"
+"$CASS" index --semantic --build-hnsw
+
+echo "✓ cass refresh complete"

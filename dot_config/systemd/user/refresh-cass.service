@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresh cass semantic search index (sessions + embeddings)
+Documentation=https://github.com/Dicklesworthstone/coding_agent_session_search
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/refresh-cass
+# Be a good background citizen — this is best-effort maintenance.
+Nice=10
+IOSchedulingClass=idle

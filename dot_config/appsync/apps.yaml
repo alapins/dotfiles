@@ -107,13 +107,19 @@ apps:
     linux:
       via: remote-script
       url: https://zed.dev/install.sh
-      repo: openai/codex
+      repo: zed-industries/zed
   codex-cli:
     linux:
       via: remote-script
       url: https://chatgpt.com/codex/install.sh
-      repo: zed-industries/zed
-  cass-memory:                                   # curl … | bash -s -- --easy-mode --verify
+      repo: openai/codex
+  cass:                                          # coding agent session search — curl … | bash -s -- --easy-mode --verify
+    linux:
+      via: remote-script
+      url: https://raw.githubusercontent.com/Dicklesworthstone/coding_agent_session_search/main/install.sh
+      args: --easy-mode --verify
+      repo: Dicklesworthstone/coding_agent_session_search   # installs a prebuilt release binary → re-run only on a new tag
+  cassms:                                         # CASS Memory System — curl … | bash -s -- --easy-mode --verify
     linux:
       via: remote-script
       url: https://raw.githubusercontent.com/Dicklesworthstone/cass_memory_system/main/install.sh
