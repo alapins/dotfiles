@@ -130,6 +130,11 @@ apps:
       url: https://raw.githubusercontent.com/Dicklesworthstone/cass_memory_system/main/install.sh
       args: --easy-mode --verify
       # No `repo:` gate → re-downloads and re-runs every apply (installer is idempotent).
+  codebase-memory-mcp:                            # code-intelligence knowledge graph MCP server (158 langs, static binary)
+    linux:
+      via: remote-script
+      url: https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh
+      repo: DeusData/codebase-memory-mcp   # installs a prebuilt release binary + configures agents → re-run only on a new tag
 
   # ---- examples of the remaining mechanisms (disabled until verified) ----
   # ringboard installs a GUI + CLI client; route once the installer URL is confirmed.
