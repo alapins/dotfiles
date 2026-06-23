@@ -34,6 +34,7 @@ apps:
   bat:         { via: brew }
   lazygit:     { via: brew }
   lazydocker:  { via: brew }
+  gh:          { via: brew }   # GitHub CLI; its token feeds the GitHub MCP (see dot_config/zsh/dot_zshenv)
   carapace:    { via: brew }
   claude-code: { via: cask }
   # Rust toolchain — official rustup installer (rustup.rs), NOT brew. brew's
