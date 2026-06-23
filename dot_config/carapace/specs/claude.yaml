@@ -1,0 +1,130 @@
+# yaml-language-server: $schema=https://carapace.sh/schemas/command.json
+# Completion spec for the `claude` (Claude Code) CLI.
+# Hand-maintained (claude has no native completion generator).
+# Regenerate the flag list from: claude --help
+name: claude
+description: Claude Code CLI
+flags:
+  # --- boolean flags ---
+  "--allow-dangerously-skip-permissions": "Allow bypassing all permission checks as an option"
+  "--bare": "Minimal mode: skip hooks, LSP, plugins, auto-memory, CLAUDE.md discovery, etc."
+  "--brief": "Enable SendUserMessage tool for agent-to-user communication"
+  "--chrome": "Enable Claude in Chrome integration"
+  "-c, --continue": "Continue the most recent conversation in the current directory"
+  "--dangerously-skip-permissions": "Bypass all permission checks"
+  "--disable-slash-commands": "Disable all skills"
+  "--exclude-dynamic-system-prompt-sections": "Move per-machine sections out of the system prompt for better cache reuse"
+  "--fork-session": "When resuming, create a new session ID instead of reusing the original"
+  "-h, --help": "Display help for command"
+  "--ide": "Automatically connect to IDE on startup if exactly one is available"
+  "--include-hook-events": "Include all hook lifecycle events in the output stream"
+  "--include-partial-messages": "Include partial message chunks as they arrive"
+  "--mcp-debug": "[DEPRECATED] Enable MCP debug mode"
+  "--no-chrome": "Disable Claude in Chrome integration"
+  "--no-session-persistence": "Disable session persistence"
+  "-p, --print": "Print response and exit (useful for pipes)"
+  "--replay-user-messages": "Re-emit user messages from stdin back on stdout"
+  "--safe-mode": "Start with all customizations disabled (troubleshooting)"
+  "--strict-mcp-config": "Only use MCP servers from --mcp-config"
+  "--verbose": "Override verbose mode setting from config"
+  "-v, --version": "Output the version number"
+
+  # --- flags with a required value ---
+  "--agent=": "Agent for the current session"
+  "--agents=": "JSON object defining custom agents"
+  "--append-system-prompt=": "Append a system prompt to the default system prompt"
+  "--debug-file=": "Write debug logs to a specific file path"
+  "--effort=": "Effort level for the current session"
+  "--fallback-model=": "Automatic fallback model(s) when default is overloaded (with --print)"
+  "--input-format=": "Input format (with --print): text or stream-json"
+  "--json-schema=": "JSON Schema for structured output validation"
+  "--max-budget-usd=": "Maximum dollar amount to spend on API calls (with --print)"
+  "--model=": "Model for the current session (alias or full name)"
+  "-n, --name=": "Set a display name for this session"
+  "--output-format=": "Output format (with --print): text, json, or stream-json"
+  "--permission-mode=": "Permission mode to use for the session"
+  "--remote-control-session-name-prefix=": "Prefix for auto-generated Remote Control session names"
+  "--session-id=": "Use a specific session ID (valid UUID)"
+  "--setting-sources=": "Comma-separated setting sources to load (user, project, local)"
+  "--settings=": "Path to a settings JSON file or a JSON string"
+  "--system-prompt=": "System prompt to use for the session"
+
+  # --- flags with an optional value ---
+  "-d, --debug?": "Enable debug mode with optional category filtering"
+  "--from-pr?": "Resume a session linked to a PR (number/URL) or open picker"
+  "--prompt-suggestions?": "Enable prompt suggestions"
+  "--remote-control?": "Start an interactive session with Remote Control enabled (optionally named)"
+  "-r, --resume?": "Resume a conversation by session ID, or open interactive picker"
+  "--tmux?": "Create a tmux session for the worktree (use --tmux=classic for traditional tmux)"
+  "-w, --worktree?": "Create a new git worktree for this session (optionally named)"
+
+  # --- variadic value flags (consume multiple values) ---
+  "--add-dir=": {description: "Additional directories to allow tool access to", nargs: -1}
+  "--allowedTools=": {description: "Tool names to allow", nargs: -1}
+  "--allowed-tools=": {description: "Tool names to allow (alias of --allowedTools)", nargs: -1}
+  "--betas=": {description: "Beta headers to include in API requests", nargs: -1}
+  "--disallowedTools=": {description: "Tool names to deny", nargs: -1}
+  "--disallowed-tools=": {description: "Tool names to deny (alias of --disallowedTools)", nargs: -1}
+  "--file=": {description: "File resources to download at startup (file_id:relative_path)", nargs: -1}
+  "--mcp-config=": {description: "Load MCP servers from JSON files or strings", nargs: -1}
+  "--tools=": {description: "Available tools from the built-in set", nargs: -1}
+
+  # --- repeatable value flags ---
+  "--plugin-dir*": "Load a plugin from a directory or .zip for this session only"
+  "--plugin-url*": "Fetch a plugin .zip from a URL for this session only"
+completion:
+  flag:
+    model:
+      - "opus\tlatest Opus"
+      - "sonnet\tlatest Sonnet"
+      - "fable\tlatest Fable"
+      - "haiku\tlatest Haiku"
+      - "claude-opus-4-8"
+      - "claude-sonnet-4-6"
+      - "claude-haiku-4-5-20251001"
+      - "claude-fable-5"
+    fallback-model:
+      - "opus"
+      - "sonnet"
+      - "fable"
+      - "haiku"
+    effort: ["low", "medium", "high", "xhigh", "max"]
+    input-format: ["text", "stream-json"]
+    output-format: ["text", "json", "stream-json"]
+    permission-mode: ["acceptEdits", "auto", "bypassPermissions", "default", "dontAsk", "plan"]
+    prompt-suggestions: ["true", "false", "1", "0", "yes", "no", "on", "off"]
+    setting-sources: ["$list(,)", "user", "project", "local"]
+    settings: ["$files"]
+    debug-file: ["$files"]
+    add-dir: ["$directories"]
+    file: ["$files"]
+    mcp-config: ["$files"]
+    plugin-dir: ["$directories"]
+commands:
+  - name: agents
+    description: Manage background agents
+  - name: auth
+    description: Manage authentication
+  - name: auto-mode
+    description: Inspect auto mode classifier configuration
+  - name: doctor
+    description: Check the health of your Claude Code auto-updater
+  - name: install
+    description: Install Claude Code native build
+    completion:
+      positional:
+        - ["stable", "latest"]
+  - name: mcp
+    description: Configure and manage MCP servers
+  - name: plugin
+    description: Manage Claude Code plugins
+    aliases: ["plugins"]
+  - name: project
+    description: Manage Claude Code project state
+  - name: setup-token
+    description: Set up a long-lived authentication token
+  - name: ultrareview
+    description: Run a cloud-hosted multi-agent code review of the current branch or a PR
+  - name: update
+    description: Check for updates and install if available
+    aliases: ["upgrade"]

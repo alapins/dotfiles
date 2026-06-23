@@ -14,6 +14,7 @@ alias cm=chezmoi
 alias am="$HOME/.local/bin/cm"   # cass memory system (its binary is named `cm`, which `cm` aliases to chezmoi shadows)
 
 # Carapace config
+fpath=(${ZDOTDIR:-$HOME/.config/zsh}/completions $fpath)  # native compdef completions (e.g. _codex) loaded by compinit below
 autoload -U compinit && compinit
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
 zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
