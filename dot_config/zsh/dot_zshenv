@@ -1,0 +1,6 @@
+# Read by zsh whenever ZDOTDIR is already set in the environment (e.g. nested
+# shells, GUI/launcher-spawned processes). The first login shell reads
+# ~/.zshenv instead, which sets ZDOTDIR; duplicate the gh-token export here so
+# both launch contexts get it. Without this, Claude Code's GitHub MCP server
+# inherits an empty GITHUB_PERSONAL_ACCESS_TOKEN and fails to authenticate.
+export GITHUB_PERSONAL_ACCESS_TOKEN="$(/home/linuxbrew/.linuxbrew/bin/gh auth token 2>/dev/null)"
