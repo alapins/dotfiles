@@ -11,6 +11,7 @@ alias v=nvim
 alias lv=y
 alias lg=lazygit
 alias cm=chezmoi
+alias am="$HOME/.local/bin/cm"   # cass memory system (its binary is named `cm`, which `cm` aliases to chezmoi shadows)
 
 # Carapace config
 autoload -U compinit && compinit
