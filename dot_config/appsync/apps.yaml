@@ -119,6 +119,11 @@ apps:
       url: https://raw.githubusercontent.com/Dicklesworthstone/coding_agent_session_search/main/install.sh
       args: --easy-mode --verify
       repo: Dicklesworthstone/coding_agent_session_search   # installs a prebuilt release binary → re-run only on a new tag
+  beads:                                          # bd — local-first issue tracker for coding agents (Steve Yegge)
+    linux:
+      via: remote-script
+      url: https://raw.githubusercontent.com/gastownhall/beads/main/scripts/install.sh
+      repo: steveyegge/beads   # installs a prebuilt release binary → re-run only on a new tag
   cassms:                                         # CASS Memory System — curl … | bash -s -- --easy-mode --verify
     linux:
       via: remote-script
