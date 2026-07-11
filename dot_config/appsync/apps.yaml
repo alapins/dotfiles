@@ -25,10 +25,14 @@ apps:
   # ---- cross-OS CLI tools (migrated from dot_config/Brewfile) ----
   ripgrep:     { via: brew }
   sevenzip:    { via: brew }
-  imagemagick: { via: brew }
+  imagemagick:                 # Linux: Fedora ImageMagick is in the bluebuild image
+    linux:  { via: image }
+    darwin: { via: brew }
   resvg:       { via: brew }
   zoxide:      { via: brew }
-  poppler:     { via: brew }
+  poppler:                     # Linux: Fedora poppler-utils is in the bluebuild image
+    linux:  { via: image }
+    darwin: { via: brew }
   yazi:        { via: brew }
   dust:        { via: brew }
   bat:         { via: brew }
@@ -36,6 +40,21 @@ apps:
   lazydocker:  { via: brew }
   gh:          { via: brew }   # GitHub CLI; its token feeds the GitHub MCP (see dot_config/zsh/dot_zshenv)
   carapace:    { via: brew }
+  # brew-on-both CLI tools (formerly unmanaged drift; not in the Linux image, so
+  # brew provides them on Linux too — same as macOS).
+  atuin:            { via: brew }   # shell history sync/search
+  direnv:           { via: brew }   # per-directory env loader
+  dysk:             { via: brew }   # disk-usage TUI (df replacement)
+  eza:              { via: brew }   # ls replacement
+  fd:               { via: brew }   # find replacement
+  mise:             { via: brew }   # runtime/version manager; ~/.local/bin/mise wrapper execs this binary
+  starship:         { via: brew }   # shell prompt
+  tealdeer:         { via: brew }   # tldr client (`tldr`)
+  trash-cli:        { via: brew }   # trash-put (rm-to-trash)
+  ugrep:            { via: brew }   # fast grep
+  uutils-coreutils: { via: brew }   # Rust coreutils
+  bash-preexec:     { via: brew }   # bash preexec/precmd hooks (atuin/starship bash integration)
+  bbrew:            { via: brew, name: valkyrie00/bbrew/bbrew }   # Homebrew TUI (third-party tap)
   claude-code: { via: cask }
   # Rust toolchain — official rustup installer (rustup.rs), NOT brew. brew's
   # `rust`+`rustup` conflict (rustup is keg-only) and break `brew upgrade` under
@@ -45,6 +64,9 @@ apps:
     linux:  { via: local-script, path: install-rustup.sh }
     darwin: { via: local-script, path: install-rustup.sh }
   uv:         { via: brew }
+  glove80-keymap-visualizer:
+    linux:  { via: local-script, path: install-glove80-keymap-visualizer.sh }
+    darwin: { via: local-script, path: install-glove80-keymap-visualizer.sh }
   # NOTE: yq is a BOOTSTRAP PREREQUISITE of appsync (it parses this file), so it is
   # NOT listed as a managed app — that would be circular. yq is provided before
   # install.sh ever runs: baked into the image on Linux (install-appsync-tools.sh),
@@ -73,6 +95,9 @@ apps:
     linux: { via: image }
     darwin: { via: cask }
   syncthing:
+    linux: { via: image }
+    darwin: { via: brew }
+  chezmoi:                    # dotfile manager; Linux: baked into the image by bluebuild
     linux: { via: image }
     darwin: { via: brew }
 
@@ -130,7 +155,7 @@ apps:
       via: remote-script
       url: https://raw.githubusercontent.com/Dicklesworthstone/cass_memory_system/main/install.sh
       args: --easy-mode --verify
-      # No `repo:` gate → re-downloads and re-runs every apply (installer is idempotent).
+      repo: Dicklesworthstone/cass_memory_system   # installs a prebuilt release binary → re-run only on a new tag
   codebase-memory-mcp:                            # code-intelligence knowledge graph MCP server (158 langs, static binary)
     linux:
       via: remote-script
