@@ -1,0 +1,8 @@
+# winpodx secrets — NOT chezmoi-managed. These hold real credentials (agent
+# tokens, RDP password) and this repo is PUBLIC, so they must never enter it.
+# The `private_` prefix only sets 0600 perms on apply; it does NOT encrypt the
+# source. Manage these by hand directly under ~/.config/winpodx/.
+.config/winpodx/agent_token.txt
+.config/winpodx/compose.yaml
+.config/winpodx/winpodx.toml
+.config/winpodx/oem/agent_token.txt
