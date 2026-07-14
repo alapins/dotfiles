@@ -12,7 +12,7 @@
 #   mas      id: <number>         Mac App Store app
 #   flatpak  id: <app-id>         Linux GUI app NOT already in the bluebuild image
 #   image                         Linux: provided by the bluebuild image (skipped; documents provenance)
-#   appimage am: <name> | url:    Linux: managed by AppMan
+#   appimage am: <name>           Linux: managed by AppMan (installs its catalog app by name; `appman -l`)
 #   mise     spec: <backend:tool> pinned single-binary CLI (aqua:/github:/ubi:/cargo:)
 #   npm      [name: <pkg>]        global npm package (`npm install -g`); any OS with npm
 #   remote-script url: [repo:] [args:]
@@ -134,6 +134,10 @@ apps:
       via: remote-script
       url: https://zed.dev/install.sh
       repo: zed-industries/zed
+  cursor:                                        # AI code editor — AppImage via AppMan (catalog entry; auto-updates)
+    linux:
+      via: appimage
+      am: cursor
   codex-cli:
     linux:
       via: remote-script
@@ -160,7 +164,16 @@ apps:
     linux:
       via: remote-script
       url: https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh
-      repo: DeusData/codebase-memory-mcp   # installs a prebuilt release binary + configures agents → re-run only on a new tag
+      args: --skip-config                 # install the BINARY ONLY — no global MCP entry, hooks, or skills.
+      repo: DeusData/codebase-memory-mcp   # per-project registration is done in each project's apm.yml (dependencies.mcp)
+  # Agent Package Manager (Microsoft): declares skills/MCPs/prompts/plugins per project in apm.yml,
+  # commits a lockfile with integrity hashes → `apm install` reproduces the same agent context byte-for-byte
+  # across Claude Code, Codex, Cursor, Gemini, etc. Official tap; brew works on Linux + macOS, so cross-OS.
+  apm:              { via: brew, name: microsoft/apm/apm }   # updates via brew upgrade (also has `apm self-update`)
+  # GSD (gsd-core) is NOT managed here — it's wired per-project via an APM lifecycle hook
+  # (`npx @opengsd/gsd-core --claude --local`) in each project's apm.yml, so its files live
+  # in the project's .claude/gsd-core (out of ~/.claude), not machine-global. See the
+  # project apm.yml lifecycle block. install-gsd.sh is retired (was the old --global bootstrap).
 
   # ---- examples of the remaining mechanisms (disabled until verified) ----
   # ringboard installs a GUI + CLI client; route once the installer URL is confirmed.
@@ -196,4 +209,4 @@ apps:
     enabled: false
     linux:
       via: appimage
-      am: example-appimage        # AppMan catalog name (or use `url:` for an unlisted AppImage)
+      am: example-appimage        # AppMan catalog name (browse the catalog with `appman -l`)

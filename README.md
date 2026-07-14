@@ -65,7 +65,7 @@ apps:
 | `mas` | `id:` (App Store id) | Mac App Store app | macOS |
 | `flatpak` | `id:` (app id) | Flatpak from Flathub (not already in the image) | Linux |
 | `image` | — | Provided by the bluebuild image; skipped (documents provenance) | Linux |
-| `appimage` | `am:` name **or** `url:` | GUI AppImage via **AppMan** (creates a launcher entry + icon) | Linux |
+| `appimage` | `am:` (AppMan catalog name) | GUI AppImage via **AppMan** (creates a launcher entry + icon). AppMan installs from its catalog by name — there is no arbitrary-URL install (`appman -l` lists the catalog). | Linux |
 | `mise` | `spec:` e.g. `aqua:cli/cli` | Single-binary CLI via mise (on your shell `PATH`) | any |
 | `npm` | `name:` (optional) | Global npm package (`npm install -g`); the app key is the package name unless `name:` overrides it (e.g. scoped pkgs) | any (where `npm` exists) |
 | `remote-script` | `url:`, `repo:` (optional) | Download the script to `~/.local/share/appsync/installers/<app>/` and run it. With `repo:`, it only re-runs when that GitHub repo cuts a new release. | any |

@@ -42,15 +42,15 @@ install_flatpak() { # id
   run "flatpak install -y --noninteractive flathub \"$id\"" && ok "flatpak $id"
 }
 
-install_appimage() { # app : uses `am` name or `url`
-  local app=$1 am url
+install_appimage() { # app : AppMan catalog name via `am` (defaults to the app key)
+  local app=$1 am
   [ "$OS" = linux ] || { skip "appimage $app (not linux)"; return 0; }
   have appman || { warn "appimage $app: appman not installed yet — skipping"; return 0; }
-  am=$(field "$app" "$OS" am); url=$(field "$app" "$OS" url)
-  if appman -l 2>/dev/null | grep -qiw "${am:-$app}"; then skip "appimage $app (present)"; return 0; fi
-  if [ -n "$am" ]; then run "appman -i \"$am\"" && ok "appimage $am"
-  elif [ -n "$url" ]; then run "appman -i \"$url\"" && ok "appimage $app (url)"
-  else warn "appimage $app: needs `am:` or `url:`"; return 1; fi
+  am=$(field "$app" "$OS" am); am=${am:-$app}   # AppMan installs from its catalog by name
+  # Presence check must query INSTALLED apps (`-f`), not the catalog (`-l`, which lists
+  # everything installable and would always match — skipping the install).
+  if appman -f 2>/dev/null | grep -qiw "$am"; then skip "appimage $app (present)"; return 0; fi
+  run "appman -i \"$am\"" && ok "appimage $am"
 }
 
 install_mise() { # app : spec like aqua:tool / github:o/r / cargo:crate
