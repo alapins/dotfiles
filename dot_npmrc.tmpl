@@ -1,0 +1,8 @@
+# Managed by chezmoi (source: dot_npmrc.tmpl).
+# Give `npm install -g` a USER-WRITABLE global prefix. The system npm's default
+# prefix is /usr/local -> /var/usrlocal, which is root-owned on the immutable
+# image, so unprivileged global installs fail with EACCES. Pointing the prefix at
+# ~/.local puts global binaries in ~/.local/bin (already on PATH) and modules in
+# ~/.local/lib/node_modules — no sudo. This is what makes appsync's `via: npm`
+# mechanism work (e.g. ccstatusline).
+prefix={{ .chezmoi.homeDir }}/.local

@@ -170,6 +170,12 @@ apps:
   # commits a lockfile with integrity hashes → `apm install` reproduces the same agent context byte-for-byte
   # across Claude Code, Codex, Cursor, Gemini, etc. Official tap; brew works on Linux + macOS, so cross-OS.
   apm:              { via: brew, name: microsoft/apm/apm }   # updates via brew upgrade (also has `apm self-update`)
+  # Claude Code status line renderer. Installed globally so the statusLine command
+  # (~/.claude/settings.json) can call the `ccstatusline` binary directly — running
+  # `npx -y ccstatusline@latest` per render re-checks the registry (~12s) and blows
+  # past Claude Code's status-line timeout, so nothing shows. Needs the ~/.local
+  # npm prefix from dot_npmrc.tmpl (system /usr/local is root-owned).
+  ccstatusline:     { via: npm }
   # GSD (gsd-core) is NOT managed here — it's wired per-project via an APM lifecycle hook
   # (`npx @opengsd/gsd-core --claude --local`) in each project's apm.yml, so its files live
   # in the project's .claude/gsd-core (out of ~/.claude), not machine-global. See the
