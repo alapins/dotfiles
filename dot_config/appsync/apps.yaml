@@ -12,7 +12,8 @@
 #   mas      id: <number>         Mac App Store app
 #   flatpak  id: <app-id>         Linux GUI app NOT already in the bluebuild image
 #   image                         Linux: provided by the bluebuild image (skipped; documents provenance)
-#   appimage am: <name>           Linux: managed by AppMan (installs its catalog app by name; `appman -l`)
+#   appimage am: <name>           Linux: AppMan catalog app by name (`appman -l`)
+#   appimage github: <user/repo>  Linux: AppMan-managed AppImage from a GitHub repo NOT in the catalog (`appman -e`)
 #   mise     spec: <backend:tool> pinned single-binary CLI (aqua:/github:/ubi:/cargo:)
 #   npm      [name: <pkg>]        global npm package (`npm install -g`); any OS with npm
 #   remote-script url: [repo:] [args:]
@@ -129,6 +130,16 @@ apps:
   obs:
     linux: { via: image }                        # com.obsproject.Studio
     darwin: { via: cask }
+  dolt:
+    linux:
+      via: remote-script
+      url: https://github.com/dolthub/dolt/releases/latest/download/install.sh
+      repo: dolthub/dolt
+  treehouse:
+    linux:
+      via: remote-script
+      url: https://kunchenguid.github.io/treehouse/install.sh
+      repo: kunchenguid/treehouse
   zed:
     linux:
       via: remote-script
@@ -138,6 +149,10 @@ apps:
     linux:
       via: appimage
       am: cursor
+  sidra:                                         # Apple Music desktop client (wimpysworld) — AppImage from GitHub (not in AppMan catalog)
+    linux:
+      via: appimage
+      github: wimpysworld/sidra
   codex-cli:
     linux:
       via: remote-script

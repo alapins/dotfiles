@@ -42,15 +42,25 @@ install_flatpak() { # id
   run "flatpak install -y --noninteractive flathub \"$id\"" && ok "flatpak $id"
 }
 
-install_appimage() { # app : AppMan catalog name via `am` (defaults to the app key)
-  local app=$1 am
+install_appimage() { # app : AppMan catalog name via `am`, OR a GitHub repo via `github`
+  local app=$1 am gh name
   [ "$OS" = linux ] || { skip "appimage $app (not linux)"; return 0; }
   have appman || { warn "appimage $app: appman not installed yet — skipping"; return 0; }
-  am=$(field "$app" "$OS" am); am=${am:-$app}   # AppMan installs from its catalog by name
+  gh=$(field "$app" "$OS" github)   # `user/repo` for AppImages outside AppMan's catalog
+  if [ -n "$gh" ]; then
+    name=$app                       # `appman -e … $app` installs under the app key
+  else
+    am=$(field "$app" "$OS" am); am=${am:-$app}   # AppMan installs from its catalog by name
+    name=$am
+  fi
   # Presence check must query INSTALLED apps (`-f`), not the catalog (`-l`, which lists
   # everything installable and would always match — skipping the install).
-  if appman -f 2>/dev/null | grep -qiw "$am"; then skip "appimage $app (present)"; return 0; fi
-  run "appman -i \"$am\"" && ok "appimage $am"
+  if appman -f 2>/dev/null | grep -qiw "$name"; then skip "appimage $app (present)"; return 0; fi
+  if [ -n "$gh" ]; then
+    run "appman -e \"$gh\" \"$app\"" && ok "appimage $app (github:$gh)"
+  else
+    run "appman -i \"$am\"" && ok "appimage $am"
+  fi
 }
 
 install_mise() { # app : spec like aqua:tool / github:o/r / cargo:crate
