@@ -153,6 +153,10 @@ apps:
     linux:
       via: appimage
       github: wimpysworld/sidra
+  kavita-import-tool:                            # eBook folder-structure helper for Kavita (Tauri/Rust) — AppImage from GitHub (not in AppMan catalog)
+    linux:
+      via: appimage
+      github: mackenly/kavita-import-tool
   codex-cli:
     linux:
       via: remote-script
