@@ -1,0 +1,53 @@
+# ~/apm.yml — GLOBAL agent context for Claude Code.
+#
+# Run `apm install` FROM YOUR HOME DIRECTORY to materialize this into ~/.claude:
+#   skills   -> ~/.claude/skills/
+#   hooks    -> ~/.claude/settings.json
+#   commands -> ~/.claude/commands/ , agents -> ~/.claude/agents/
+#
+# This is the "available in every session, everywhere" layer. Keep it SMALL —
+# put project-specific skills/MCPs/hooks in each project's own apm.yml.
+#
+# MCP CAVEAT: MCP servers declared here would land in ~/.mcp.json, which Claude
+# treats as the HOME-directory project scope (active only when CWD=~), NOT
+# user-global. So do NOT put MCPs here — keep them per-project. (The one always-on
+# MCP you kept, github, rides with the github plugin, not APM.)
+#
+# DEPENDENCY NOTE: mattpocock skills are plain SKILL.md dirs with NO dependency
+# metadata. APM installs exactly what you list — it will NOT auto-pull a skill
+# that another invokes at runtime. e.g. grill-me runs `/grilling`, so BOTH are
+# listed below. If you add a skill that calls another, add that one too.
+
+name: global-claude
+version: 0.1.0
+target: [claude]
+
+dependencies:
+  apm:
+    # --- productivity / meta (useful in any session) ---
+    - mattpocock/skills/skills/productivity/grilling          # required by grill-me
+    - mattpocock/skills/skills/productivity/grill-me
+    - mattpocock/skills/skills/productivity/handoff
+    - mattpocock/skills/skills/productivity/teach
+    - mattpocock/skills/skills/productivity/writing-great-skills
+
+    # --- skill discovery (use `find-skills` to locate new skills to add here) ---
+    - vercel-labs/skills/skills/find-skills
+
+    # --- your own skill, preserved from the teardown (local path, relative to ~) ---
+    - path: ~/projects/project_management/skills/tdd-planned
+
+    # --- engineering skills: usually better PER-PROJECT than global. ---
+    # Uncomment any you truly want available in every session:
+    # - mattpocock/skills/skills/engineering/tdd
+    # - mattpocock/skills/skills/engineering/diagnosing-bugs
+    # - mattpocock/skills/skills/engineering/domain-modeling
+    # - mattpocock/skills/skills/engineering/codebase-design
+    # - mattpocock/skills/skills/engineering/implement
+    # - mattpocock/skills/skills/engineering/triage
+    # - mattpocock/skills/skills/engineering/resolving-merge-conflicts
+
+  # hooks: none globally. Code-intelligence (cbm) hooks live in each code
+  # project's .apm/hooks/. Add here only if you want a hook in EVERY session.
+
+  # mcp: intentionally omitted — see MCP CAVEAT above.

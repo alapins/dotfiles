@@ -63,3 +63,6 @@ fi
 autoload bashcompinit
 bashcompinit
 source "/home/alex/.local/share/bash-completion/completions/appman"
+
+# direnv: per-directory env, loads .env via `dotenv` in .envrc
+eval "$(direnv hook zsh)"
