@@ -65,6 +65,11 @@ apps:
     linux:  { via: local-script, path: install-rustup.sh }
     darwin: { via: local-script, path: install-rustup.sh }
   uv:         { via: brew }
+  # RAR archiver (`rar` + `unrar` CLIs). brew's `rar` is a macOS-only cask, so on
+  # Linux install RARLAB's official x64 tarball via a local-script into ~/.local/bin.
+  rar:
+    linux:  { via: local-script, path: install-rar.sh }
+    darwin: { via: cask }        # rarlab cask (deprecated over Gatekeeper, but still the mac route)
   glove80-keymap-visualizer:
     linux:  { via: local-script, path: install-glove80-keymap-visualizer.sh }
     darwin: { via: local-script, path: install-glove80-keymap-visualizer.sh }
@@ -156,6 +161,10 @@ apps:
     linux:
       via: appimage
       github: mackenly/kavita-import-tool
+  comictagger:                                   # write metadata to digital comics — AppImage via AppMan (catalog entry; auto-updates)
+    linux:
+      via: appimage
+      am: comictagger
   codex-cli:
     linux:
       via: remote-script
