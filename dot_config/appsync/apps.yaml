@@ -130,11 +130,10 @@ apps:
   obs:
     linux: { via: image }                        # com.obsproject.Studio
     darwin: { via: cask }
-  dolt:
-    linux:
-      via: remote-script
-      url: https://github.com/dolthub/dolt/releases/latest/download/install.sh
-      repo: dolthub/dolt
+  # Git for Data. Upstream install.sh hardcodes root + /usr/local/bin (no user-dir
+  # override), so it can't run in an unattended non-root `chezmoi apply`. brew ships
+  # dolt for Linux + macOS, so use it — cross-OS and user-space, like the other CLIs.
+  dolt:             { via: brew }
   treehouse:
     linux:
       via: remote-script
