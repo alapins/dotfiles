@@ -191,18 +191,32 @@ apps:
     linux:
       via: remote-script
       url: https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh
-      args: --skip-config                 # install the BINARY ONLY — no global MCP entry, hooks, or skills.
+      # --skip-config: install the BINARY ONLY — no global MCP entry, hooks, or skills.
+      # --dir: the installer defaults to "$HOME/.local/bin", but passwd sets HOME=/home/alex and
+      # /home is a symlink to var/home. The 0.10.x activation transaction refuses a target path that
+      # traverses a symlink ("failed to stage install candidate: activation transaction I/O failed"),
+      # so resolve it first — same directory, real path. Drop this once upstream resolves the target.
+      args: '--skip-config --dir=$(readlink -f "$HOME")/.local/bin'
       repo: DeusData/codebase-memory-mcp   # per-project registration is done in each project's apm.yml (dependencies.mcp)
   # Agent Package Manager (Microsoft): declares skills/MCPs/prompts/plugins per project in apm.yml,
   # commits a lockfile with integrity hashes → `apm install` reproduces the same agent context byte-for-byte
   # across Claude Code, Codex, Cursor, Gemini, etc. Official tap; brew works on Linux + macOS, so cross-OS.
   apm:              { via: brew, name: microsoft/apm/apm }   # updates via brew upgrade (also has `apm self-update`)
+  # Runtime for coding agents: a background server holding real terminals open so Claude Code/Codex
+  # sessions survive the lid closing. Upstream pushes `curl herdr.dev/install.sh`, but it's in
+  # homebrew-core (bottled, Linux + macOS) — so brew, cross-OS, and updates with brew upgrade.
+  # Not started here; `herdr server` (or `brew services start herdr`) runs the daemon.
+  herdr:            { via: brew }
   # Claude Code status line renderer. Installed globally so the statusLine command
   # (~/.claude/settings.json) can call the `ccstatusline` binary directly — running
   # `npx -y ccstatusline@latest` per render re-checks the registry (~12s) and blows
   # past Claude Code's status-line timeout, so nothing shows. Needs the ~/.local
   # npm prefix from dot_npmrc.tmpl (system /usr/local is root-owned).
   ccstatusline:     { via: npm }
+  # Local web UI for the beads (bd) issue tracker — `bdui` serves a browser view of
+  # the Dolt-backed issue DB in the current repo's .beads/. Global so `bdui` is on
+  # PATH in any beads workspace. Same ~/.local npm prefix as ccstatusline.
+  beads-ui:         { via: npm }   # provides the `bdui` binary
   # GSD (gsd-core) is NOT managed here — it's wired per-project via an APM lifecycle hook
   # (`npx @opengsd/gsd-core --claude --local`) in each project's apm.yml, so its files live
   # in the project's .claude/gsd-core (out of ~/.claude), not machine-global. See the
