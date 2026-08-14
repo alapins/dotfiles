@@ -154,3 +154,11 @@ IntensityEffect=0
 ContrastEffect=2
 ContrastAmount=0.1
 IntensityAmount=0
+
+# Skip thumbnailing files larger than 50 MiB. KIO thumbnail workers were reading
+# 300-700 MB audiobooks whole over the rclone SFTP mount under ~/mnt and blocking
+# Dolphin for minutes. Verified 0 of 139 sampled .m4b/.mp3 files carry embedded
+# cover art, so those reads could never yield a thumbnail -- 6.6 GB was
+# transferred for zero results. Local music (<50 MiB) still gets artwork.
+[PreviewSettings]
+MaximumSize=52428800

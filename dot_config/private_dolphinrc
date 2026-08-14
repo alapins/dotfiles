@@ -1,0 +1,35 @@
+[DetailsMode]
+PreviewSize=16
+
+[ExtractDialog]
+2 screens: Height=1414
+2 screens: Width=1279
+DirHistory[$e]=$HOME/Downloads/
+
+[General]
+BrowseThroughArchives=true
+DoubleClickViewAction=none
+GlobalViewProps=false
+ShowFullPath=true
+Version=202
+ViewPropsTimestamp=2026,1,17,18,13,36.726
+
+[IconsMode]
+PreviewSize=128
+
+[KFileDialog Settings]
+Places Icons Auto-resize=false
+Places Icons Static Size=22
+
+[MainWindow]
+MenuBar=Disabled
+
+[PreviewSettings]
+MaximumSize=52428800
+Plugins=imagethumbnail,jpegthumbnail,svgthumbnail,rawthumbnail,heif,exrthumbnail,fontthumbnail,cursorthumbnail
+
+[UiSettings]
+ColorScheme=BreezeDark
+
+[VersionControl]
+enabledPlugins=Git
