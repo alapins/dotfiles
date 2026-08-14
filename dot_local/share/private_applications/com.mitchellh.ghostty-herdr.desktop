@@ -1,0 +1,19 @@
+[Desktop Entry]
+Version=1.0
+Name=Ghostty (herdr)
+GenericName=Terminal
+Comment=Ghostty terminal running the herdr workspace manager
+Type=Application
+TryExec=/home/linuxbrew/.linuxbrew/bin/herdr
+Exec=/usr/bin/ghostty --gtk-single-instance=false --class=com.mitchellh.ghostty-herdr --command=/home/linuxbrew/.linuxbrew/bin/herdr
+Icon=com.mitchellh.ghostty
+Categories=System;TerminalEmulator;
+Keywords=terminal;tty;pty;herdr;agent;workspace;
+StartupNotify=true
+StartupWMClass=com.mitchellh.ghostty-herdr
+Terminal=false
+Actions=new-window;
+
+[Desktop Action new-window]
+Name=New Window
+Exec=/usr/bin/ghostty --gtk-single-instance=false --class=com.mitchellh.ghostty-herdr --command=/home/linuxbrew/.linuxbrew/bin/herdr

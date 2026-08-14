@@ -1,0 +1,24 @@
+[Desktop Entry]
+Version=1.0
+Name=Ghostty (zsh)
+GenericName=Terminal
+Comment=Ghostty terminal running a plain zsh shell, without tmux
+Type=Application
+TryExec=/usr/bin/ghostty
+Exec=/usr/bin/ghostty --gtk-single-instance=false --class=com.mitchellh.ghostty-zsh --command="zsh -l"
+Icon=com.mitchellh.ghostty
+Categories=System;TerminalEmulator;
+Keywords=terminal;tty;pty;zsh;shell;
+StartupNotify=true
+StartupWMClass=com.mitchellh.ghostty-zsh
+Terminal=false
+X-TerminalArgExec=-e
+X-TerminalArgTitle=--title=
+X-TerminalArgAppId=--class=
+X-TerminalArgDir=--working-directory=
+X-TerminalArgHold=--wait-after-command
+Actions=new-window;
+
+[Desktop Action new-window]
+Name=New Window
+Exec=/usr/bin/ghostty --gtk-single-instance=false --class=com.mitchellh.ghostty-zsh --command="zsh -l"
