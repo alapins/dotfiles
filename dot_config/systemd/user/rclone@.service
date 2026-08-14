@@ -15,12 +15,25 @@ Wants=network-online.target
 
 [Service]
 Type=notify
+# VFS cache tuning:
+#   full          - cache reads too (not just writes), stored as SPARSE files so
+#                   only the byte ranges actually read are fetched. Lets tag/cover
+#                   readers see audio metadata without pulling whole files.
+#   max-size 25G  - the old 100M thrashed: it evicted partial downloads faster
+#                   than they completed, so reads never finished.
+#   max-age 72h   - default 1h evicted cached data almost immediately, forcing
+#                   constant re-downloads over a ~1 MB/s link.
+#   chunk-size 4M - default is 128M, so a few-KB metadata read pulled 128 MiB
+#                   (~2 min at 1 MB/s). Doubles up to 128M for sequential streaming.
 ExecStartPre=/usr/bin/mkdir -p /var/home/alex/mnt/%i
 ExecStart= \
   /usr/bin/rclone mount \
     --config=/var/home/alex/.config/rclone/rclone.conf \
-    --vfs-cache-mode writes \
-    --vfs-cache-max-size 100M \
+    --vfs-cache-mode full \
+    --vfs-cache-max-size 25G \
+    --vfs-cache-max-age 72h \
+    --vfs-read-chunk-size 4M \
+    --vfs-read-chunk-size-limit 128M \
     --log-level INFO \
     --log-file /tmp/rclone-%i.log \
     --umask 022 \
