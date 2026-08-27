@@ -39,7 +39,9 @@ install_flatpak() { # id
   local id=$1
   [ "$OS" = linux ] || { skip "flatpak $id (not linux)"; return 0; }
   if flatpak info "$id" >/dev/null 2>&1; then skip "flatpak $id (present)"; return 0; fi
-  run "flatpak install -y --noninteractive flathub \"$id\"" && ok "flatpak $id"
+  # --system: "flathub" exists in both system and user installations; without an
+  # explicit target, --noninteractive refuses to pick one and aborts.
+  run "flatpak install -y --noninteractive --system flathub \"$id\"" && ok "flatpak $id"
 }
 
 install_appimage() { # app : AppMan catalog name via `am`, OR a GitHub repo via `github`

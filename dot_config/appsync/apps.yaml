@@ -54,6 +54,8 @@ apps:
   trash-cli:        { via: brew }   # trash-put (rm-to-trash)
   ugrep:            { via: brew }   # fast grep
   uutils-coreutils: { via: brew }   # Rust coreutils
+  xdotool:                          # X11 window control; minimizes xwaylandvideobridge at login on COSMIC
+    linux: { via: brew }
   bash-preexec:     { via: brew }   # bash preexec/precmd hooks (atuin/starship bash integration)
   bbrew:            { via: brew, name: valkyrie00/bbrew/bbrew }   # Homebrew TUI (third-party tap)
   claude-code: { via: cask }
@@ -135,6 +137,8 @@ apps:
   obs:
     linux: { via: image }                        # com.obsproject.Studio
     darwin: { via: cask }
+  piper:
+    linux: { via: flatpak, id: org.freedesktop.Piper }
   # Git for Data. Upstream install.sh hardcodes root + /usr/local/bin (no user-dir
   # override), so it can't run in an unattended non-root `chezmoi apply`. brew ships
   # dolt for Linux + macOS, so use it — cross-OS and user-space, like the other CLIs.
