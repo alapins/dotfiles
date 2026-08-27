@@ -1,0 +1,14 @@
+[Desktop Entry]
+# Overrides /etc/xdg/autostart/org.kde.xwaylandvideobridge.desktop: COSMIC has
+# no window rules to hide the bridge window, so launch it via a wrapper that
+# minimizes it with xdotool.
+Type=Application
+Name=Xwayland Video Bridge (minimized)
+GenericName=Share screens and windows to XWayland applications
+Icon=org.kde.xwaylandvideobridge
+Exec=/home/alex/.local/bin/xwaylandvideobridge-minimized
+StartupNotify=false
+NoDisplay=true
+X-KDE-autostart-phase=2
+X-GNOME-Autostart-enabled=true
+Categories=Qt;KDE;Utility;

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Start XWayland Video Bridge and minimize its window.
+# COSMIC has no window rules (KWin hides this window automatically; cosmic-comp
+# can't yet), so we iconify it via xdotool once it appears.
+set -u
+
+/usr/bin/xwaylandvideobridge &
+
+xdotool="$(command -v xdotool || echo /home/linuxbrew/.linuxbrew/bin/xdotool)"
+
+for _ in $(seq 1 30); do
+    if "$xdotool" search --classname xwaylandvideobridge windowminimize %@ 2>/dev/null; then
+        exit 0
+    fi
+    sleep 0.5
+done
+exit 0
