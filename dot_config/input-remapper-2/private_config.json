@@ -1,0 +1,6 @@
+{
+    "version": "2.2.1",
+    "autoload": {
+        "Logitech Gaming Mouse G502": "new preset 2"
+    }
+}

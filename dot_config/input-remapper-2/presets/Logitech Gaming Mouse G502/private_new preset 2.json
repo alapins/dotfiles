@@ -1,0 +1,14 @@
+[
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 277,
+                "origin_hash": "3ccf3d2c8237a6c6b10609afdf9d73ad"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_LEFTMETA",
+        "mapping_type": "key_macro"
+    }
+]

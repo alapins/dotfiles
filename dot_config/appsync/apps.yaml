@@ -108,6 +108,8 @@ apps:
   chezmoi:                    # dotfile manager; Linux: baked into the image by bluebuild
     linux: { via: image }
     darwin: { via: brew }
+  input-remapper:             # maps G502 mouse button to Super for window move/resize; Linux-only
+    linux: { via: image }
 
   # ---- GUI apps: flatpak on Linux (image), cask on mac ----
   keepassxc:
