@@ -1,5 +1,18 @@
 {
     (
+        modifiers: [],
+        key: "Print",
+        description: Some("Screenshot (Omarchy-style)"),
+    ): Spawn("~/.local/bin/screenshot.sh"),
+    (
+        modifiers: [
+            Super,
+            Alt,
+        ],
+        key: "s",
+        description: Some("Edit last screenshot (satty)"),
+    ): Spawn("~/.local/bin/screenshot.sh edit"),
+    (
         modifiers: [
             Super,
         ],
@@ -66,7 +79,8 @@
             Shift,
         ],
         key: "s",
-    ): System(Screenshot),
+        description: Some("Screenshot region selector"),
+    ): Spawn("~/.local/bin/screenshot.sh"),
     (
         modifiers: [
             Ctrl,

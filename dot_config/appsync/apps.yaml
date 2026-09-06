@@ -75,6 +75,16 @@ apps:
   glove80-keymap-visualizer:
     linux:  { via: local-script, path: install-glove80-keymap-visualizer.sh }
     darwin: { via: local-script, path: install-glove80-keymap-visualizer.sh }
+  # Omarchy-style screenshots on COSMIC: slurp (region picker) + grim (capture).
+  # Not in brew/flatpak/AppMan and upstream ships no binaries, so a local-script
+  # extracts the Fedora RPMs into ~/.local/bin (base image has all their libs).
+  # Used by ~/.local/bin/screenshot.sh, bound to Print in COSMIC shortcuts.
+  grim-slurp:
+    linux: { via: local-script, path: install-grim-slurp.sh }
+  # Screenshot annotation editor (the click-to-edit step after a capture);
+  # prebuilt GitHub-release binary via mise's ubi backend.
+  satty:
+    linux: { via: mise, spec: "ubi:gabm/satty" }
   # NOTE: yq is a BOOTSTRAP PREREQUISITE of appsync (it parses this file), so it is
   # NOT listed as a managed app — that would be circular. yq is provided before
   # install.sh ever runs: baked into the image on Linux (install-appsync-tools.sh),
