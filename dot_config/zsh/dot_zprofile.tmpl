@@ -10,3 +10,10 @@ then
     PATH="$HOME/.local/bin:$PATH"
 fi
 export PATH
+{{- if .isDarwin }}
+# Homebrew env. On Linux the bluebuild image already sets this up system-wide;
+# on macOS nothing does, so brew's bin/ would be missing from PATH entirely.
+if [ -x "{{ .brewPrefix }}/bin/brew" ]; then
+    eval "$("{{ .brewPrefix }}/bin/brew" shellenv)"
+fi
+{{- end }}

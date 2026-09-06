@@ -1,8 +1,50 @@
-# winpodx secrets — NOT chezmoi-managed. These hold real credentials (agent
-# tokens, RDP password) and this repo is PUBLIC, so they must never enter it.
-# The `private_` prefix only sets 0600 perms on apply; it does NOT encrypt the
-# source. Manage these by hand directly under ~/.config/winpodx/.
-.config/winpodx/agent_token.txt
-.config/winpodx/compose.yaml
-.config/winpodx/winpodx.toml
-.config/winpodx/oem/agent_token.txt
+# winpodx — NOT chezmoi-managed, the ENTIRE directory. It holds real
+# credentials (agent tokens, RDP password) and this repo is PUBLIC, so nothing
+# under it may enter the source tree. The `private_` prefix only sets 0600
+# perms on apply; it does NOT encrypt the source. Manage everything by hand
+# directly under ~/.config/winpodx/. (Previously only the secret files were
+# listed here, which let `chezmoi add` pull the rest of the directory into the
+# public source tree — dot_config/winpodx/ is also in .gitignore as a backstop.)
+.config/winpodx
+.config/winpodx/**
+
+# Repo documentation — belongs in the source tree, not in $HOME.
+# (README.md is deliberately NOT listed: it already applies to ~/README.md and
+# has done so historically. Add it here if you want $HOME kept clean too.)
+MACOS.md
+
+# ---------------------------------------------------------------------------
+# Per-OS gating. This file is ALWAYS evaluated as a template (no .tmpl suffix
+# needed). Ignored paths stay in the source repo but are never applied, so one
+# branch serves both the Aurora/COSMIC desktop and a Mac.
+#
+# Check what a change does here with:  chezmoi ignored
+# ---------------------------------------------------------------------------
+
+{{ if ne .chezmoi.os "linux" }}
+# --- Linux-only: desktop plumbing with no macOS equivalent ---
+.config/cosmic                  # COSMIC shell: panel, theme, shortcuts
+.config/systemd                 # user units — macOS uses launchd
+.config/autostart               # XDG autostart (.desktop)
+.config/pipewire                # PipeWire EQ
+.config/input-remapper-2        # G502 button remap (Linux evdev)
+.config/kdeglobals              # KDE/Dolphin look & feel
+.config/dolphinrc
+.local/share/applications       # XDG .desktop entries
+.local/share/icons              # hicolor icon theme
+.local/share/pop-launcher       # COSMIC launcher plugins
+.local/bin/ssh-launcher.sh      # cosmic-launcher + ydotool + gdbus
+.local/bin/uxplay-session       # a Mac is already an AirPlay target
+.local/bin/winpodx-sleep-hook   # systemd sleep hook
+.local/bin/xwaylandvideobridge-minimized
+.local/bin/screenshot.sh        # grim/slurp/satty/wl-copy — Wayland only
+.local/bin/keepassxc-cli        # flatpak shim; the mac cask ships a real one
+.local/bin/mise                 # Seance AppImage argv[0] workaround
+{{ end }}
+
+{{ if ne .chezmoi.os "darwin" }}
+# --- macOS-only ---
+.config/skhd                       # global hotkey daemon (COSMIC shortcuts equiv)
+.local/bin/screenshot-macos.sh     # screencapture pipeline (grim/slurp equiv)
+.local/bin/ssh-launcher-macos.sh   # AppleScript ssh chooser (ydotool equiv)
+{{ end }}

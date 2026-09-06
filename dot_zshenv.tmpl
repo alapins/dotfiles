@@ -1,0 +1,10 @@
+export ZDOTDIR="$HOME/.config/zsh"
+
+# Rust toolchain (rustup). Guarded: on a fresh machine this file is applied
+# before appsync installs rustup, and an unguarded `.` would abort .zshenv —
+# taking ZDOTDIR and everything below it with it.
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+# Feed gh CLI token to the GitHub MCP server (Claude Code). Absolute path on
+# purpose: GUI/launcher-spawned processes may have a minimal PATH.
+export GITHUB_PERSONAL_ACCESS_TOKEN="$({{ .brewPrefix }}/bin/gh auth token 2>/dev/null)"

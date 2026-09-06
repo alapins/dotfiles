@@ -1,0 +1,39 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+# Bootstrap Homebrew on macOS. Must run BEFORE the appsync hook
+# (run_onchange_after_run-appsync-install.sh.tmpl), which needs `brew` to
+# install yq — and yq is what parses apps.yaml.
+#
+# On Linux this template renders empty and chezmoi skips it entirely; brew is
+# baked into the bluebuild image there.
+set -euo pipefail
+
+BREW_PREFIX="{{ .brewPrefix }}"
+
+if command -v brew >/dev/null 2>&1; then
+  echo "==> brew already installed ($(command -v brew))"
+  exit 0
+fi
+
+# The Homebrew installer needs the Command Line Tools. `xcode-select --install`
+# opens a GUI dialog and returns immediately, so it cannot be relied on in an
+# unattended apply — but the brew installer will drive the install itself.
+if ! xcode-select -p >/dev/null 2>&1; then
+  echo "==> Command Line Tools not present; the Homebrew installer will fetch them"
+fi
+
+echo "==> installing Homebrew"
+NONINTERACTIVE=1 /bin/bash -c \
+  "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Put brew on PATH for the remainder of this apply. Login shells get this from
+# ~/.zprofile (see dot_config/zsh/dot_zprofile.tmpl), but that file may not be
+# applied yet at this point in the run.
+if [ -x "$BREW_PREFIX/bin/brew" ]; then
+  eval "$("$BREW_PREFIX/bin/brew" shellenv)"
+  echo "==> brew ready at $BREW_PREFIX"
+else
+  echo " warn  brew not found at $BREW_PREFIX after install" >&2
+  exit 1
+fi
+{{- end -}}

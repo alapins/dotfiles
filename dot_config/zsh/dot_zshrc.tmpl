@@ -18,10 +18,10 @@ fpath=(${ZDOTDIR:-$HOME/.config/zsh}/completions $fpath)  # native compdef compl
 autoload -U compinit && compinit
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
 zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
-source <(carapace _carapace)
+command -v carapace >/dev/null && source <(carapace _carapace)
 
 
-eval "$(starship init zsh)"
+command -v starship >/dev/null && eval "$(starship init zsh)"
 
 _cursor_normal() { printf '\e[2 q\e]12;#e4e4e4\a'; }
 _cursor_insert() { printf '\e[6 q\e]12;#88aaff\a'; }
@@ -36,6 +36,7 @@ zle-line-finish() { _cursor_normal; }
 zle -N zle-keymap-select
 zle -N zle-line-init
 zle -N zle-line-finish
+{{ if .isLinux -}}
 ### bling.sh source start
 test -f /usr/share/ublue-os/bling/bling.sh && source /usr/share/ublue-os/bling/bling.sh
 ### bling.sh source end
@@ -46,23 +47,35 @@ test -f /usr/share/ublue-os/bling/bling.sh && source /usr/share/ublue-os/bling/b
 # Override them here so hook-env calls also use exec -a mise.
 if [[ -n "$SEANCE_SHELL_INTEGRATION" ]]; then
   _mise_hook() {
-    eval "$(exec -a mise /home/linuxbrew/.linuxbrew/bin/mise hook-env -s zsh)"
+    eval "$(exec -a mise {{ .brewPrefix }}/bin/mise hook-env -s zsh)"
   }
   _mise_hook_precmd() {
     if [[ "${__MISE_ZSH_CHPWD_RAN:-0}" == "1" ]]; then
       export __MISE_ZSH_CHPWD_RAN=0
       return
     fi
-    eval "$(exec -a mise /home/linuxbrew/.linuxbrew/bin/mise hook-env -s zsh --reason precmd)"
+    eval "$(exec -a mise {{ .brewPrefix }}/bin/mise hook-env -s zsh --reason precmd)"
   }
   _mise_hook_chpwd() {
     export __MISE_ZSH_CHPWD_RAN=1
-    eval "$(exec -a mise /home/linuxbrew/.linuxbrew/bin/mise hook-env -s zsh --reason chpwd)"
+    eval "$(exec -a mise {{ .brewPrefix }}/bin/mise hook-env -s zsh --reason chpwd)"
   }
 fi
+{{ else -}}
+# macOS has no ublue bling and no Seance AppImage runtime, so neither the
+# bling.sh source nor the mise argv[0] workaround applies. mise activates
+# normally here:
+command -v mise >/dev/null && eval "$(mise activate zsh)"
+{{ end -}}
 autoload bashcompinit
 bashcompinit
-source "/home/alex/.local/share/bash-completion/completions/appman"
+{{ if .isLinux -}}
+# appman is Linux-only (rootless AppImage manager). Guarded so a missing file
+# can't abort .zshrc.
+_appman_comp="$HOME/.local/share/bash-completion/completions/appman"
+[[ -r $_appman_comp ]] && source "$_appman_comp"
+unset _appman_comp
+{{ end -}}
 
 # direnv: per-directory env, loads .env via `dotenv` in .envrc
-eval "$(direnv hook zsh)"
+command -v direnv >/dev/null && eval "$(direnv hook zsh)"

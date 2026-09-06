@@ -1,0 +1,72 @@
+# skhd — global hotkey daemon for macOS. The COSMIC "custom shortcuts"
+# equivalent, managed by chezmoi (macOS only; see .chezmoiignore).
+#
+# Source of truth on Linux:
+#   dot_config/cosmic/com.system76.CosmicSettings.Shortcuts/v1/custom
+#
+# ---------------------------------------------------------------------------
+# MODIFIER MAPPING
+#
+#   Linux Ctrl   -> macOS Cmd    (app commands: copy/paste/save/quit)
+#   Linux Super  -> macOS Ctrl   (window management)
+#   Linux Alt    -> macOS Alt    (unchanged)
+#
+# Super and Ctrl swap roles because Cmd absorbs everything Linux Ctrl does,
+# which leaves macOS Ctrl as free as Super is on Linux.
+#
+# Consequently the modifier space is divided as:
+#
+#   ctrl + shift  ->  Rectangle    (window layout; configured in Rectangle's
+#                                   own prefs, NOT here — skhd binds nothing
+#                                   on ctrl+shift so it never shadows it)
+#   ctrl + alt    ->  skhd         (app launchers, below — identical to Linux)
+#
+# `alt` in skhd is the physical Option key. For these to reach skhd rather
+# than emit ¡™£¢, nothing else may claim them first.
+#
+# Reload after editing:  skhd --reload   (skhd also hotloads this file)
+# Find a key's name:     skhd --observe
+# ---------------------------------------------------------------------------
+
+
+# --- app launchers: byte-for-byte the same chords as COSMIC -----------------
+
+# Ctrl+Alt+E — file manager. COSMIC: Spawn("dolphin")
+ctrl + alt - e : open -a Finder ~
+
+# Ctrl+Alt+T — terminal. COSMIC: System(Terminal) -> ghostty
+# `open -na` forces a NEW instance/window rather than focusing the existing one,
+# matching how the COSMIC binding always spawns a fresh terminal.
+ctrl + alt - t : open -na Ghostty
+
+# Ctrl+Alt+S — ssh host picker. COSMIC: Spawn("~/.local/bin/ssh-launcher.sh")
+# The Linux version drives cosmic-launcher with ydotool; the macOS version is a
+# self-contained AppleScript chooser over ~/.ssh/config (no extra dependencies).
+ctrl + alt - s : ~/.local/bin/ssh-launcher-macos.sh
+
+# Ctrl+Alt+O — Obsidian daily note. COSMIC: Spawn("xdg-open obsidian://daily")
+ctrl + alt - o : open "obsidian://daily"
+
+# Ctrl+Alt+V — clipboard history. COSMIC: ringboard-egui toggle
+# Maccy stands in for ringboard. Maccy's own hotkey should be cleared in its
+# preferences so this is the single binding.
+ctrl + alt - v : open -a Maccy
+
+
+# --- screenshots -----------------------------------------------------------
+# COSMIC binds Print and Super+Shift+S to the region selector, and Super+Alt+S
+# to "edit last screenshot". Mac keyboards have no Print key, and under the
+# modifier mapping above Super+Shift+S becomes Ctrl+Shift+S — which belongs to
+# Rectangle's namespace. So the region selector lives on Ctrl+Alt+P ("print")
+# alongside the rest of the skhd family, and edit keeps its Alt+S shape.
+#
+# macOS already ships Cmd+Shift+3/4/5; these are additive, not replacements.
+
+# Region select -> file + clipboard + notification
+ctrl + alt - p : ~/.local/bin/screenshot-macos.sh region
+
+# Whole screen
+ctrl + alt + shift - p : ~/.local/bin/screenshot-macos.sh fullscreen
+
+# Ctrl+Alt+Shift+S — edit most recent screenshot. COSMIC: Super+Alt+S
+ctrl + alt + shift - s : ~/.local/bin/screenshot-macos.sh edit

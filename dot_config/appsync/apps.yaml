@@ -92,6 +92,11 @@ apps:
   topgrade:                   # universal updater (see update.sh)
     linux: { via: image }     # baked into the image (install-appsync-tools.sh)
     darwin: { via: brew }
+  # `mas` is the Mac App Store CLI that backs the `via: mas` mechanism in
+  # install.sh. Nothing uses `via: mas` yet, but the tool must exist before the
+  # first entry that does — brew bundle's `mas "…"` lines fail without it.
+  mas:
+    darwin: { via: brew }
 
   # ---- apps in the Linux image; mac gets a cask equivalent ----
   ghostty:
@@ -120,6 +125,25 @@ apps:
     darwin: { via: brew }
   input-remapper:             # maps G502 mouse button to Super for window move/resize; Linux-only
     linux: { via: image }
+
+  # ---- macOS desktop shell: the pieces COSMIC provides natively on Linux ----
+  # skhd = global hotkey daemon (the COSMIC "custom shortcuts" equivalent).
+  # Config: ~/.config/skhd/skhdrc. NOT in homebrew-core — it lives in the
+  # author's tap, and both the tap and the project moved koekeishiya -> asmvik
+  # (the old URLs still redirect, but pin the current owner). Started at login
+  # via `skhd --start-service`, which installs a launchd LaunchAgent; see
+  # run_onchange_after_configure-skhd.sh.tmpl.
+  skhd:
+    darwin: { via: brew, name: asmvik/formulae/skhd }
+  # Window layout — the COSMIC tiling equivalent. Shortcuts are configured in
+  # Rectangle's own prefs (Ctrl+Shift+<vim>, mirroring COSMIC's Super+<vim>),
+  # NOT here, so skhdrc deliberately binds nothing on Ctrl+Shift.
+  rectangle:
+    darwin: { via: cask }
+  # Clipboard history — stands in for ringboard, which is Linux-only.
+  # Bound to Ctrl+Alt+V in skhdrc to match the COSMIC binding.
+  maccy:
+    darwin: { via: cask }
 
   # ---- GUI apps: flatpak on Linux (image), cask on mac ----
   keepassxc:
@@ -155,20 +179,21 @@ apps:
   # override), so it can't run in an unattended non-root `chezmoi apply`. brew ships
   # dolt for Linux + macOS, so use it — cross-OS and user-space, like the other CLIs.
   dolt:             { via: brew }
-  treehouse:
-    linux:
-      via: remote-script
-      url: https://kunchenguid.github.io/treehouse/install.sh
-      repo: kunchenguid/treehouse
+  treehouse:                                     # ships darwin-amd64/arm64 release tarballs — cross-OS
+    via: remote-script
+    url: https://kunchenguid.github.io/treehouse/install.sh
+    repo: kunchenguid/treehouse
   zed:
-    linux:
+    linux:                                       # no Linux cask; upstream's install.sh
       via: remote-script
       url: https://zed.dev/install.sh
       repo: zed-industries/zed
-  cursor:                                        # AI code editor — AppImage via AppMan (catalog entry; auto-updates)
-    linux:
+    darwin: { via: cask }                        # cask `zed` — gets the real .app bundle + auto-update
+  cursor:                                        # AI code editor
+    linux:                                       # AppImage via AppMan (catalog entry; auto-updates)
       via: appimage
       am: cursor
+    darwin: { via: cask }                        # cask `cursor`
   sidra:                                         # Apple Music desktop client (wimpysworld) — AppImage from GitHub (not in AppMan catalog)
     linux:
       via: appimage
@@ -181,39 +206,39 @@ apps:
     linux:
       via: appimage
       am: comictagger
-  codex-cli:
-    linux:
-      via: remote-script
-      url: https://chatgpt.com/codex/install.sh
-      repo: openai/codex
+  codex-cli:                                      # ships *-apple-darwin release artifacts — cross-OS
+    via: remote-script
+    url: https://chatgpt.com/codex/install.sh
+    repo: openai/codex
   cass:                                          # coding agent session search — curl … | bash -s -- --easy-mode --verify
-    linux:
-      via: remote-script
-      url: https://raw.githubusercontent.com/Dicklesworthstone/coding_agent_session_search/main/install.sh
-      args: --easy-mode --verify
-      repo: Dicklesworthstone/coding_agent_session_search   # installs a prebuilt release binary → re-run only on a new tag
+    via: remote-script                            # ships cass-darwin-aarch64 release tarballs — cross-OS
+    url: https://raw.githubusercontent.com/Dicklesworthstone/coding_agent_session_search/main/install.sh
+    args: --easy-mode --verify
+    repo: Dicklesworthstone/coding_agent_session_search   # installs a prebuilt release binary → re-run only on a new tag
   beads:                                          # bd — local-first issue tracker for coding agents (Steve Yegge)
-    linux:
-      via: remote-script
-      url: https://raw.githubusercontent.com/gastownhall/beads/main/scripts/install.sh
-      repo: steveyegge/beads   # installs a prebuilt release binary → re-run only on a new tag
+    via: remote-script                            # ships beads_*_darwin_{amd64,arm64} release tarballs — cross-OS
+    url: https://raw.githubusercontent.com/gastownhall/beads/main/scripts/install.sh
+    repo: steveyegge/beads   # installs a prebuilt release binary → re-run only on a new tag
   cassms:                                         # CASS Memory System — curl … | bash -s -- --easy-mode --verify
-    linux:
-      via: remote-script
-      url: https://raw.githubusercontent.com/Dicklesworthstone/cass_memory_system/main/install.sh
-      args: --easy-mode --verify
-      repo: Dicklesworthstone/cass_memory_system   # installs a prebuilt release binary → re-run only on a new tag
+    via: remote-script                            # ships cass-memory-macos-arm64 release binaries — cross-OS
+    url: https://raw.githubusercontent.com/Dicklesworthstone/cass_memory_system/main/install.sh
+    args: --easy-mode --verify
+    repo: Dicklesworthstone/cass_memory_system   # installs a prebuilt release binary → re-run only on a new tag
   codebase-memory-mcp:                            # code-intelligence knowledge graph MCP server (158 langs, static binary)
+    via: remote-script                            # ships codebase-memory-mcp-darwin-{amd64,arm64} — cross-OS
+    url: https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh
+    repo: DeusData/codebase-memory-mcp   # per-project registration is done in each project's apm.yml (dependencies.mcp)
+    # --skip-config: install the BINARY ONLY — no global MCP entry, hooks, or skills.
+    # `args` is per-OS because only Linux needs the symlink workaround; lib.sh's field()
+    # falls through to the OS-scoped value when the top-level key is absent.
     linux:
-      via: remote-script
-      url: https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh
-      # --skip-config: install the BINARY ONLY — no global MCP entry, hooks, or skills.
       # --dir: the installer defaults to "$HOME/.local/bin", but passwd sets HOME=/home/alex and
       # /home is a symlink to var/home. The 0.10.x activation transaction refuses a target path that
       # traverses a symlink ("failed to stage install candidate: activation transaction I/O failed"),
       # so resolve it first — same directory, real path. Drop this once upstream resolves the target.
       args: '--skip-config --dir=$(readlink -f "$HOME")/.local/bin'
-      repo: DeusData/codebase-memory-mcp   # per-project registration is done in each project's apm.yml (dependencies.mcp)
+    darwin:
+      args: '--skip-config'   # no ostree /home symlink on macOS, so the default target is fine
   # Agent Package Manager (Microsoft): declares skills/MCPs/prompts/plugins per project in apm.yml,
   # commits a lockfile with integrity hashes → `apm install` reproduces the same agent context byte-for-byte
   # across Claude Code, Codex, Cursor, Gemini, etc. Official tap; brew works on Linux + macOS, so cross-OS.

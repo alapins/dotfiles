@@ -1,0 +1,53 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+# Register skhd as a launchd service so it starts at login, and reload it
+# whenever skhdrc changes. macOS only — renders empty on Linux, so chezmoi
+# skips it entirely.
+#
+# skhdrc: {{ include "dot_config/skhd/skhdrc" | sha256sum }}
+set -uo pipefail
+
+command -v skhd >/dev/null 2>&1 || {
+  echo " warn  skhd not installed yet — appsync installs it via brew; re-run"
+  echo "       'chezmoi apply' afterwards to register the service." >&2
+  exit 0
+}
+
+PLIST="$HOME/Library/LaunchAgents/com.koekeishiya.skhd.plist"
+
+if [ -f "$PLIST" ]; then
+  # Already registered: just pick up the new config. --restart-service is more
+  # reliable than --reload when the plist itself may have changed.
+  echo "==> reloading skhd"
+  skhd --restart-service || skhd --reload || true
+else
+  echo "==> registering skhd as a login service"
+  # Installs the LaunchAgent above (RunAtLoad) and starts it now.
+  skhd --start-service || {
+    echo " warn  'skhd --start-service' failed" >&2
+    exit 0
+  }
+fi
+
+# skhd needs Accessibility to observe key events, and macOS only prompts on
+# first run — it cannot be granted programmatically. Nothing works until this
+# is done, so say it loudly rather than leaving a silent no-op.
+cat <<'EOF'
+
+  ------------------------------------------------------------------
+  skhd requires two macOS permissions, granted by hand, once:
+
+    1. Accessibility     — System Settings > Privacy & Security >
+                           Accessibility > enable skhd
+                           (skhd must be RESTARTED after granting:
+                            skhd --restart-service)
+
+    2. Screen Recording  — System Settings > Privacy & Security >
+                           Screen Recording > enable skhd
+                           (needed for the screenshot bindings)
+
+  Logs: /tmp/skhd_$USER.out.log  and  /tmp/skhd_$USER.err.log
+  ------------------------------------------------------------------
+
+EOF
+{{- end -}}
