@@ -25,8 +25,6 @@ emit_results() {
 
 launch_terminal() {
     host="$1"
-    # Log for debugging
-    echo "Launching terminal for $host" >> /tmp/ssh-plugin.log
     
     if command -v xdg-terminal-exec >/dev/null 2>&1; then
         nohup xdg-terminal-exec ssh "$host" >/dev/null 2>&1 &
@@ -36,11 +34,9 @@ launch_terminal() {
         nohup cosmic-terminal --command "ssh $host" >/dev/null 2>&1 &
     fi
     
-    echo "Launch attempted" >> /tmp/ssh-plugin.log
 }
 
 while IFS= read -r line; do
-    echo "received: $line" >> /tmp/ssh-plugin.log
     if printf '%s' "$line" | grep -q '"Search"'; then
         query=$(printf '%s' "$line" | grep -o '"Search":"[^"]*"' | cut -d'"' -f4)
         emit_results "$query"
@@ -48,7 +44,6 @@ while IFS= read -r line; do
     elif printf '%s' "$line" | grep -q '"Activate"'; then
         id=$(printf '%s' "$line" | grep -o '"Activate":[0-9]*' | grep -o '[0-9]*')
         host=$(get_hosts | sed -n "$((id + 1))p")
-        echo "Got activate for id=$id host=$host" >> /tmp/ssh-plugin.log
         launch_terminal "$host"
         printf '"Close"\n'
 
