@@ -206,6 +206,19 @@ apps:
     linux:
       via: appimage
       am: comictagger
+  helium:                                        # Chromium-based browser — AppImage via AppMan (catalog entry; auto-updates)
+    linux:                                       # KeePassXC-Browser manifest: dot_config/net.imput.helium/NativeMessagingHosts
+      via: appimage
+      am: helium
+  # bun runs helium-drm-fixer (below); npm, not brew, because brew bundle runs
+  # last and the fixer needs bun in the same pass. Keep ABOVE helium-drm.
+  bun:
+    linux: { via: npm }
+  # Copies Chrome's Widevine into Helium's profile so DRM (YouTube, Spotify…) works.
+  # Must stay BELOW helium: update.sh re-runs install.sh after `appman -u`, so this
+  # follows every Helium install/upgrade; no-op unless Chrome's Widevine is newer.
+  helium-drm:
+    linux: { via: local-script, path: install-helium-drm.sh }
   codex-cli:                                      # ships *-apple-darwin release artifacts — cross-OS
     via: remote-script
     url: https://chatgpt.com/codex/install.sh
