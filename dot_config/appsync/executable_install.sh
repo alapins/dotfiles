@@ -82,14 +82,15 @@ install_npm() { # app : global package via `npm install -g`
 }
 
 install_remote_script() { # app
-  local app=$1 url repo tag dir marker cur args
+  local app=$1 url repo vurl tag dir marker cur args
   url=$(field "$app" "$OS" url); repo=$(field "$app" "$OS" repo)
+  vurl=$(field "$app" "$OS" version_url)   # alternative to repo: JSON manifest with a top-level `version`
   args=$(field "$app" "$OS" args)          # optional flags passed to the installer
   [ -n "$url" ] || { warn "remote-script $app: needs `url:`"; return 1; }
   dir="$INSTALLERS_DIR/$app"; marker="$STATE_DIR/$app.tag"; mkdir -p "$dir"
-  # If a repo is given, only (re)run when the latest tag changes.
-  if [ -n "$repo" ]; then
-    tag=$(latest_tag "$repo")
+  # If a repo (or version_url) is given, only (re)run when the latest tag changes.
+  if [ -n "$repo" ] || [ -n "$vurl" ]; then
+    if [ -n "$repo" ]; then tag=$(latest_tag "$repo"); else tag=$(manifest_version "$vurl"); fi
     cur=$([ -f "$marker" ] && cat "$marker" || echo "")
     if [ -n "$tag" ] && [ "$tag" = "$cur" ]; then skip "remote-script $app ($tag present)"; return 0; fi
   fi

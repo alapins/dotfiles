@@ -60,6 +60,11 @@ enabled() {
   return 0
 }
 
+# version from a JSON manifest URL's top-level `.version` (empty on failure)
+manifest_version() {
+  have curl && curl -fsSL "$1" 2>/dev/null | yq -p json -r '.version' 2>/dev/null
+}
+
 # latest GitHub release tag for owner/repo (empty on failure)
 latest_tag() {
   local repo=$1
