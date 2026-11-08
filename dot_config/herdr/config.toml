@@ -1,0 +1,150 @@
+# herdr config — hand-translated from ~/.config/tmux/tmux.conf
+#
+# Your tmux bindings live in the `root` table (no prefix), so they're written
+# here as direct chords ("alt+h") rather than prefix bindings.
+#
+# Validate with:  herdr config check
+# Reload live:    herdr server reload-config
+
+[theme]
+# was: set -g @catppuccin_flavor 'mocha'
+name = "catppuccin"
+
+[ui]
+# was: set -g mouse on
+mouse_capture = true
+
+[keys]
+# Prefix stays herdr's default ctrl+b — your tmux.conf never overrode it.
+
+# --- Alt+vim-arrows to focus panes -------------------------------------
+# was: bind-key -r -T root M-h/j/k/l select-pane -L/-D/-U/-R
+focus_pane_left  = "alt+h"
+focus_pane_down  = "alt+j"
+focus_pane_up    = "alt+k"
+focus_pane_right = "alt+l"
+
+# --- Splits -------------------------------------------------------------
+# NOTE ON NAMING: tmux and herdr use opposite conventions. tmux's `-h`
+# (side-by-side) is herdr's `split_vertical` (vertical divider). If M-o and
+# M-u come out swapped, exchange these two values.
+#
+# was: bind-key -r -T root M-o split-window -h   (new pane to the right)
+split_vertical   = "alt+."
+# was: bind-key -r -T root M-u split-window -v   (new pane below)
+split_horizontal = "alt+m"
+
+# --- Everything else from tmux.conf that has no native herdr action -----
+# herdr has no directional resize bindings (only a modal `resize_mode`),
+# no "split before" action, and `pane split` accepts right|down only.
+# The [[keys.command]] blocks below fill those gaps over the socket API.
+#
+# resize_mode = "prefix+r" is still available as herdr's built-in modal resize.
+
+# --- Alt+Ctrl+vim-arrows to resize panes --------------------------------
+# was: bind-key -r -T root M-C-h/j/k/l resize-pane -L/-D/-U/-R 1
+# --amount is a RATIO of the container, not cells: 0.01 ≈ 1 column in a
+# 100-col area, matching your tmux `resize-pane -L 1`. Raise for bigger steps.
+[[keys.command]]
+key = "ctrl+alt+h"
+type = "shell"
+command = "herdr pane resize --direction left --amount 0.01"
+
+[[keys.command]]
+key = "ctrl+alt+j"
+type = "shell"
+command = "herdr pane resize --direction down --amount 0.01"
+
+[[keys.command]]
+key = "ctrl+alt+k"
+type = "shell"
+command = "herdr pane resize --direction up --amount 0.01"
+
+[[keys.command]]
+key = "ctrl+alt+l"
+type = "shell"
+command = "herdr pane resize --direction right --amount 0.01"
+
+# --- "Split before" variants --------------------------------------------
+# was: bind-key -r -T root M-y split-window -hb  (new pane to the LEFT)
+[[keys.command]]
+key = "alt+n"
+type = "shell"
+command = "herdr-split left"
+
+# was: bind-key -r -T root M-i split-window -vb  (new pane ABOVE)
+[[keys.command]]
+key = "alt+,"
+type = "shell"
+command = "herdr-split up"
+
+# --- Alt+Shift+vim-arrows to MOVE panes ----------------------------------
+# Swaps the focused pane with its neighbor in that direction. Focus follows
+# the pane, so you can press repeatedly to walk it across the layout.
+# No-op if there is no neighbor that way.
+[[keys.command]]
+key = "alt+shift+h"
+type = "shell"
+command = "herdr pane swap --direction left"
+
+[[keys.command]]
+key = "alt+shift+j"
+type = "shell"
+command = "herdr pane swap --direction down"
+
+[[keys.command]]
+key = "alt+shift+k"
+type = "shell"
+command = "herdr pane swap --direction up"
+
+[[keys.command]]
+key = "alt+shift+l"
+type = "shell"
+command = "herdr pane swap --direction right"
+
+# --- mux popup -----------------------------------------------------------
+# was: bind m display-popup -E -w 85% -h 80% "~/.local/bin/mux"
+# Kept on the prefix, matching tmux (`bind m` = prefix+m).
+[[keys.command]]
+key = "prefix+m"
+type = "popup"
+command = "/var/home/alex/.local/bin/mux"
+width = "85%"
+height = "80%"
+
+[[keys.command]]
+key = "prefix+f"
+type = "plugin_action"
+command = "herdr-file-viewer.open-file-viewer"
+description = "open file viewer in split"
+
+[[keys.command]]
+key = "prefix+shift+f"
+type = "plugin_action"
+command = "herdr-file-viewer.open-file-viewer-tab"
+description = "open file viewer in tab"
+
+# ==========================================================================
+# NOT TRANSLATED — no herdr 0.8.0 equivalent
+# ==========================================================================
+#
+# Full-width/height splits (tmux `-f`):
+#   M-n split-window -hbf      M-m split-window -vf
+#   M-, split-window -vbf      M-. split-window -hf
+# tmux's -f spans the split across the whole window instead of just the
+# current pane. herdr's `pane split` always splits the current pane, so
+# there is no faithful mapping. Left unbound rather than silently bound to
+# the wrong behavior — alt+o/u/y/i cover the non-full versions.
+#
+# set -g mode-keys vi          — herdr has no configurable copy-mode keymap
+# set -g status-position top   — sidebar layout, not a status bar; see [ui]
+# set -g history-file          — no shell-history integration
+# set -g extended-keys always  — terminal-level, handled by your terminal
+# set -ag terminal-overrides   — ditto (cursor shape/color escapes)
+# set -g default-terminal      — ditto
+#
+# tpm plugins (tmux-plugins/tpm, tmux-sensible, better-mouse-mode,
+# christoomey/vim-tmux-navigator): no plugin equivalents. Note that
+# vim-tmux-navigator's seamless vim<->pane navigation is genuinely lost —
+# alt+h/j/k/l above move between herdr panes but will not hand off to a
+# Neovim split inside a pane.
