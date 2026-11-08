@@ -8,6 +8,14 @@
 .config/winpodx
 .config/winpodx/**
 
+# herdr — only config.toml is managed. The rest is runtime state (logs, session,
+# plugin registry, a cloned plugin repo) with absolute paths, and this repo is PUBLIC.
+.config/herdr/*.log
+.config/herdr/*.json
+.config/herdr/.plugins.lock
+.config/herdr/plugins
+.config/herdr/plugins/**
+
 # Repo documentation — belongs in the source tree, not in $HOME.
 # (README.md is deliberately NOT listed: it already applies to ~/README.md and
 # has done so historically. Add it here if you want $HOME kept clean too.)

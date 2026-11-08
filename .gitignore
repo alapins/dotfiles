@@ -1,2 +1,8 @@
 # winpodx must never be committed — real credentials, public repo (see .chezmoiignore)
 dot_config/winpodx/
+
+# herdr runtime state — only config.toml is tracked (see .chezmoiignore)
+dot_config/herdr/*.log
+dot_config/herdr/*.json
+dot_config/herdr/empty_dot_plugins.lock
+dot_config/herdr/plugins/
