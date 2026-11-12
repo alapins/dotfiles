@@ -61,7 +61,9 @@
     "shift-f2": "space.rename",
     "alt-s": "tab.prev",
     "alt-g": "tab.next",
-    "alt-b": "tab.new"
+    "alt-b": "tab.new",
+    "alt-.": "pane.split:right",
+    "alt-m": "pane.split:down"
   },
   "terminal": {
     "ctrl-backspace": "send:\u0017",
